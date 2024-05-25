@@ -31,8 +31,10 @@ app:
     hostname: localhost
     port: 9092
     template:
+      #      producer:
+      #        topic-name: default-topic
       consumer:
-        topic-name: default-topic
+        #        topic-name: default-topic
         properties:
           concurrency: 3
   redis:
@@ -53,6 +55,7 @@ spring:
   application:
     name: ${app.name}-service
   profiles:
+    include: aws
     active: local
   security:
     oauth2:
@@ -93,33 +96,21 @@ spring:
   kafka:
     enabled: true
     bootstrap-servers: ${app.kafka.hostname}:${app.kafka.port}
-    template:
-      consumer:
-        topic-name: ${app.kafka.template.consumer.topic-name}
-        group-id: ${app.kafka.template.consumer.topic-name}-${spring.application.name}
-        properties:
-          concurrency: ${app.kafka.template.consumer.properties.concurrency}
+    producers:
+      place-order:
+        topic-name: place-order
     consumers:
-      test-topic:
-        topic-name: test-topic
-        group-id: test-topic-${spring.application.name}
+      item-not-available:
+        topic-name: item-not-available
+        group-id: item-not-available-${spring.application.name}
         properties:
           concurrency: ${app.kafka.template.consumer.properties.concurrency}
-  #      order-item-not-available:
-  #        topic-name: order-item-not-available
-  #        group-id: order-item-not-available-${spring.application.name}
-  #        properties:
-  #          concurrency: ${app.kafka.default-concurrency}
-  #      order-processing:
-  #        topic-name: order-processing
-  #        group-id: order-processing-${spring.application.name}
-  #        properties:
-  #          concurrency: ${app.kafka.default-concurrency}
-  #      order-payment-processing:
-  #        topic-name: order-payment-processing
-  #        group-id: order-payment-processing-${spring.application.name}
-  #        properties:
-  #          concurrency: ${app.kafka.default-concurrency}
+      inventory-checked:
+        topic-name: inventory-checked
+        group-id: inventory-checked-${spring.application.name}
+        properties:
+          concurrency: ${app.kafka.template.consumer.properties.concurrency}
+
 
 server:
   port: ${app.port}
