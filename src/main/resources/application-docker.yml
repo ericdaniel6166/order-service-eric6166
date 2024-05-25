@@ -1,0 +1,26 @@
+app:
+  database:
+    hostname: postgres-order
+    port: 5432
+  eureka:
+    hostname: discovery-service
+  keycloak:
+    hostname: keycloak
+  zipkin:
+    hostname: zipkin
+  kafka:
+    hostname: kafka
+    port: 29092
+  redis:
+    hostname: redis
+
+
+#spring:
+#  profiles:
+#    active: docker
+
+logging:
+  level:
+    root: INFO
+    com.eric6166: INFO
+    org.apache.http: INFO

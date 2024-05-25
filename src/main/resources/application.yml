@@ -1,0 +1,189 @@
+app:
+  name: order # change
+  port: 8082 # change
+  version: v1
+  context-path: api/${app.name}/${app.version}
+  database:
+    hostname: localhost # change
+    port: 5433 # change
+    name: ${app.name}_service_${app.version}
+  eureka:
+    hostname: localhost # change
+    port: 8761
+  keycloak:
+    hostname: localhost # change
+    port: 8090
+    issuer-uri: http://${app.keycloak.hostname}:${app.keycloak.port}/realms/spring-boot-microservices-realm
+  swagger:
+    server:
+      hostname: localhost
+      port: 8181
+      url: http://${app.swagger.server.hostname}:${app.swagger.server.port}/${app.context-path}
+    info:
+      title: Inventory Service # change
+      version: v1.0 # change
+  zipkin:
+    hostname: localhost
+    port: 9411
+    context-path: api/v2/spans
+    endpoint: http://${app.zipkin.hostname}:${app.zipkin.port}/${app.zipkin.context-path}
+  kafka:
+    hostname: localhost
+    port: 9092
+    template:
+      consumer:
+        topic-name: default-topic
+        properties:
+          concurrency: 3
+  redis:
+    hostname: localhost
+    port: 6379
+
+security:
+  enabled: true
+  skip-urls:
+    - /guest/**
+    - /actuator/**
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /api-docs/**
+    - /error/**
+
+spring:
+  application:
+    name: ${app.name}-service
+  profiles:
+    active: local
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${app.keycloak.issuer-uri}
+  datasource:
+    url: jdbc:postgresql://${app.database.hostname}:${app.database.port}/${app.database.name}
+    username: postgres
+    password: secret
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0B
+      max-file-size: 100MB
+      max-request-size: 100MB
+  cache:
+    enabled: true
+    redis:
+      time-to-live: 60000 #ms
+    type: redis
+  data:
+    redis:
+      enabled: true
+      hostname: ${app.redis.hostname}
+      port: ${app.redis.port}
+
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0.0
+    locations: classpath:db/migration/
+    validate-on-migrate: true
+    enabled: true
+    table: schema_history
+  kafka:
+    enabled: true
+    bootstrap-servers: ${app.kafka.hostname}:${app.kafka.port}
+    template:
+      consumer:
+        topic-name: ${app.kafka.template.consumer.topic-name}
+        group-id: ${app.kafka.template.consumer.topic-name}-${spring.application.name}
+        properties:
+          concurrency: ${app.kafka.template.consumer.properties.concurrency}
+    consumers:
+      test-topic:
+        topic-name: test-topic
+        group-id: test-topic-${spring.application.name}
+        properties:
+          concurrency: ${app.kafka.template.consumer.properties.concurrency}
+  #      order-item-not-available:
+  #        topic-name: order-item-not-available
+  #        group-id: order-item-not-available-${spring.application.name}
+  #        properties:
+  #          concurrency: ${app.kafka.default-concurrency}
+  #      order-processing:
+  #        topic-name: order-processing
+  #        group-id: order-processing-${spring.application.name}
+  #        properties:
+  #          concurrency: ${app.kafka.default-concurrency}
+  #      order-payment-processing:
+  #        topic-name: order-payment-processing
+  #        group-id: order-payment-processing-${spring.application.name}
+  #        properties:
+  #          concurrency: ${app.kafka.default-concurrency}
+
+server:
+  port: ${app.port}
+  servlet:
+    context-path: /${app.context-path}
+
+
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka.hostname}:${app.eureka.port}/eureka
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-renewal-interval-in-seconds: 5
+
+
+logging:
+  level:
+    root: INFO
+    com.eric6166: DEBUG
+    org.apache.http: DEBUG
+    org.hibernate.sql: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+  pattern:
+    level: "%5p[${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+swagger:
+  server:
+    url: ${app.swagger.server.url}
+  info:
+    title: ${app.swagger.info.title}
+    version: ${app.swagger.info.version}
+    description: Documentation ${app.swagger.info.title} ${app.swagger.info.version}
+
+management:
+  tracing:
+    enabled: true
+    propagation:
+      type: b3
+    sampling:
+      probability: 1.0
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+    diskspace:
+      enabled: true
+    db:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  zipkin:
+    tracing:
+      endpoint: ${app.zipkin.endpoint}
