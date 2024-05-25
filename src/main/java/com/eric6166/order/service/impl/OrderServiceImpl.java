@@ -2,7 +2,10 @@ package com.eric6166.order.service.impl;
 
 import com.eric6166.base.dto.MessageResponse;
 import com.eric6166.base.exception.AppNotFoundException;
+import com.eric6166.base.utils.BaseConst;
 import com.eric6166.common.config.kafka.AppEvent;
+import com.eric6166.jpa.dto.PageResponse;
+import com.eric6166.jpa.utils.PageUtils;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
@@ -19,7 +22,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -95,12 +100,25 @@ public class OrderServiceImpl implements OrderService {
         if (orderList.isEmpty()) {
             throw new AppNotFoundException(String.format("order with uuid '%s'", uuid));
         }
+        return buildOrderDtoList(orderList);
+    }
+
+    private List<OrderDto> buildOrderDtoList(Iterable<Order> orders) throws JsonProcessingException {
         List<OrderDto> orderDtoList = new ArrayList<>();
-        for (var order : orderList) {
+        for (var order : orders) {
             var orderDto = modelMapper.map(order, OrderDto.class);
             orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
             orderDtoList.add(orderDto);
         }
         return orderDtoList;
     }
+
+    @Override
+    public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException, AppNotFoundException {
+        var pageable = PageUtils.buildPageable(pageNumber, pageSize, BaseConst.ID, Sort.Direction.DESC.name());
+        var page = orderRepository.findAllOrderByUsername(username, pageable);
+        var orderDtoList = buildOrderDtoList(page);
+        return new PageResponse<>(orderDtoList, page);
+    }
+
 }
