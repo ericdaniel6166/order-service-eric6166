@@ -104,7 +104,7 @@ class OrderServiceImplTest {
     void placeOrderKafka_thenReturnSuccess() throws JsonProcessingException {
         var username = "customer";
         var savedOrder = Order.builder()
-                .id(RandomUtils.nextLong())
+                .id(RandomUtils.nextLong(1, 100))
                 .uuid(UUID.randomUUID().toString())
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(orderRequest))

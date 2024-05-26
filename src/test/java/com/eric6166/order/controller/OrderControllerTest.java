@@ -6,7 +6,6 @@ import com.eric6166.base.utils.BaseConst;
 import com.eric6166.base.utils.TestConst;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.jpa.utils.PageUtils;
-import com.eric6166.order.dto.InventoryCheckedEventPayload;
 import com.eric6166.order.dto.ItemNotAvailableEventPayload;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
@@ -72,25 +71,23 @@ class OrderControllerTest {
     }
 
 
-
     @BeforeEach
     void setUp() throws JsonProcessingException {
         var uuid = UUID.randomUUID().toString();
         var username = "customer";
 
-        order = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.PLACE_ORDER, null, null);
+        order = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.PLACE_ORDER, null, null);
         var orderDetail = TestUtils.mockOrderRequest(item, item1);
         order.setOrderDetail(objectMapper.writeValueAsString(orderDetail));
         orderDto = TestUtils.mockOrderDto(order, orderDetail);
 
-        order1 = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.INVENTORY_CHECKED, null, null);
+        order1 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.INVENTORY_CHECKED, null, null);
         var inventoryCheckedItem = TestUtils.mockInventoryCheckedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var inventoryCheckedItem1 = TestUtils.mockInventoryCheckedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var orderDetail1 = TestUtils.mockInventoryCheckedEventPayload(uuid, username, inventoryCheckedItem, inventoryCheckedItem1);
         order1.setOrderDetail(objectMapper.writeValueAsString(orderDetail1));
         orderDto1 = TestUtils.mockOrderDto(order1, orderDetail1);
     }
-
 
 
     @Test
@@ -159,7 +156,7 @@ class OrderControllerTest {
     void getOrderHistoryByUsername_thenReturnOk() throws Exception {
         var username = order.getUsername();
         var uuid = UUID.randomUUID().toString();
-        var order2 = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.ITEM_NOT_AVAILABLE, null, null);
+        var order2 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.ITEM_NOT_AVAILABLE, null, null);
         var notAvailableItem = TestUtils.mockNotAvailableItem(item, RandomUtils.nextInt(0, item.getOrderQuantity() - 1));
         var notAvailableItem1 = TestUtils.mockNotAvailableItem(item1, null);
         var orderDetail2 = ItemNotAvailableEventPayload.builder()
