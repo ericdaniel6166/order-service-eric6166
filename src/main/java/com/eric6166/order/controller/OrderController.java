@@ -61,7 +61,7 @@ public class OrderController {
                                                             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
                                                                 @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
                                                                 @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
-                                                            ) throws AppNotFoundException, JsonProcessingException {
+                                                            ) throws JsonProcessingException {
         var data = orderService.getOrderHistoryByUsername(username, pageNumber, pageSize);
         if (!data.getPageable().isHasContent()) {
             return ResponseEntity.noContent().build();

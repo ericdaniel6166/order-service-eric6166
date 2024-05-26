@@ -19,5 +19,5 @@ public interface OrderService {
 
     Object getOrderHistoryByUuid(String uuid) throws AppNotFoundException, JsonProcessingException;
 
-    PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException, AppNotFoundException;
+    PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException;
 }

@@ -68,10 +68,10 @@ class OrderControllerTest {
     static void setUpAll() {
         item = TestUtils.mockOrderRequestItem(1L, 100);
         item1 = TestUtils.mockOrderRequestItem(2L, 200);
-        orderRequest = OrderRequest.builder()
-                .itemList(List.of(item, item1))
-                .build();
+        orderRequest = TestUtils.mockOrderRequest(item, item1);
     }
+
+
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
@@ -79,23 +79,19 @@ class OrderControllerTest {
         var username = "customer";
 
         order = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.PLACE_ORDER, null, null);
-        var orderDetail = OrderRequest.builder()
-                .itemList(List.of(item, item1))
-                .build();
+        var orderDetail = TestUtils.mockOrderRequest(item, item1);
         order.setOrderDetail(objectMapper.writeValueAsString(orderDetail));
         orderDto = TestUtils.mockOrderDto(order, orderDetail);
 
         order1 = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.INVENTORY_CHECKED, null, null);
         var inventoryCheckedItem = TestUtils.mockInventoryCheckedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var inventoryCheckedItem1 = TestUtils.mockInventoryCheckedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
-        var orderDetail1 = InventoryCheckedEventPayload.builder()
-                .orderUuid(uuid)
-                .username(username)
-                .itemList(List.of(inventoryCheckedItem, inventoryCheckedItem1))
-                .build();
+        var orderDetail1 = TestUtils.mockInventoryCheckedEventPayload(uuid, username, inventoryCheckedItem, inventoryCheckedItem1);
         order1.setOrderDetail(objectMapper.writeValueAsString(orderDetail1));
         orderDto1 = TestUtils.mockOrderDto(order1, orderDetail1);
     }
+
+
 
     @Test
     void placeOrderKafka_thenReturnOk() throws Exception {

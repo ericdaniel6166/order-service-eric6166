@@ -53,11 +53,11 @@ public class OrderServiceImpl implements OrderService {
                 .orderDetail(objectMapper.writeValueAsString(request))
                 .status(OrderStatus.PLACE_ORDER.name())
                 .build();
-        orderRepository.saveAndFlush(order);
+        var savedOrder = orderRepository.saveAndFlush(order);
         var placeOrderEvent = AppEvent.builder()
                 .payload(PlaceOrderEventPayload.builder()
-                        .orderUuid(order.getUuid())
-                        .username(order.getUsername())
+                        .orderUuid(savedOrder.getUuid())
+                        .username(savedOrder.getUsername())
                         .itemList(request.getItemList().stream()
                                 .map(item -> modelMapper.map(item, PlaceOrderEventPayload.Item.class))
                                 .toList())
@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
                 .build();
         kafkaTemplate.send(kafkaProducerProps.getPlaceOrderTopicName(), placeOrderEvent);
         return MessageResponse.builder()
-                .uuid(order.getUuid())
+                .uuid(savedOrder.getUuid())
                 .message("Order Successfully Placed")
                 .build();
     }
@@ -86,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Object getOrderStatusByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
-        Order order = orderRepository.findFirstByUuidOrderByIdDesc(uuid).orElseThrow(()
+        var order = orderRepository.findFirstByUuidOrderByIdDesc(uuid).orElseThrow(()
                 -> new AppNotFoundException(String.format("order with uuid '%s'", uuid)));
         var orderDto = modelMapper.map(order, OrderDto.class);
         orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
@@ -113,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException, AppNotFoundException {
+    public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException {
         var pageable = PageUtils.buildPageable(pageNumber, pageSize, BaseConst.ID, Sort.Direction.DESC.name());
         var page = orderRepository.findAllOrderByUsername(username, pageable);
         var orderDtoList = buildOrderDtoList(page);
