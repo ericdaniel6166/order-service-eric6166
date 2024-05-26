@@ -60,21 +60,19 @@ public class OrderController {
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/history/username/{username}")
     public ResponseEntity<AppResponse<PageResponse<OrderDto>>> getOrderHistoryByUsername(@PathVariable String username,
-                                                                                         @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
-                                                            @Min(value = BaseConst.DEFAULT_PAGE_NUMBER)
-                                                            @Max(value = BaseConst.DEFAULT_MAX_INTEGER) Integer pageNumber,
-                                                                                         @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
-                                                                @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
-                                                                @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
-                                                            ) throws JsonProcessingException {
+             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
+             @Min(value = BaseConst.DEFAULT_PAGE_NUMBER)
+             @Max(value = BaseConst.DEFAULT_MAX_INTEGER) Integer pageNumber,
+             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
+             @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
+             @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
+    ) throws JsonProcessingException {
         var data = orderService.getOrderHistoryByUsername(username, pageNumber, pageSize);
         if (!data.getPageable().isHasContent()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(new AppResponse<>(data));
     }
-
-
 
 
 }
