@@ -68,11 +68,6 @@ class OrderServiceImplTest {
     ObjectMapper objectMapper;
     @Mock
     ModelMapper modelMapper;
-//    @Mock
-//    JwtAuthenticationToken authentication;
-//    @Mock
-//    SecurityContext securityContext;
-
 
     @BeforeAll
     static void setUpAll() {
