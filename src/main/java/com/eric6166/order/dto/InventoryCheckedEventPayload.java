@@ -20,7 +20,10 @@ public class InventoryCheckedEventPayload {
     String username;
     List<Item> itemList;
 
+    @Builder
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Item {
         Long productId;

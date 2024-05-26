@@ -1,5 +1,6 @@
 package com.eric6166.order.controller;
 
+import com.eric6166.base.dto.AppResponse;
 import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.utils.BaseConst;
 import com.eric6166.order.dto.OrderRequest;
@@ -36,19 +37,19 @@ public class OrderController {
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/place-order-kafka")
     public ResponseEntity<Object> placeOrderKafka(@RequestBody OrderRequest request) throws JsonProcessingException {
-        return ResponseEntity.ok(orderService.placeOrderKafka(request));
+        return ResponseEntity.ok(new AppResponse<>(orderService.placeOrderKafka(request)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/status/uuid/{uuid}")
     public ResponseEntity<Object> getOrderStatusByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
-        return ResponseEntity.ok(orderService.getOrderStatusByUuid(uuid));
+        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderStatusByUuid(uuid)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/history/uuid/{uuid}")
     public ResponseEntity<Object> getOrderHistoryByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
-        return ResponseEntity.ok(orderService.getOrderHistoryByUuid(uuid));
+        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderHistoryByUuid(uuid)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
@@ -65,7 +66,7 @@ public class OrderController {
         if (!data.getPageable().isHasContent()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(data);
+        return ResponseEntity.ok(new AppResponse<>(data));
     }
 
 
