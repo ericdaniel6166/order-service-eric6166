@@ -95,8 +95,6 @@ class OrderControllerTest {
                 .build();
         order1.setOrderDetail(objectMapper.writeValueAsString(orderDetail1));
         orderDto1 = TestUtils.mockOrderDto(order1, orderDetail1);
-
-
     }
 
     @Test
@@ -166,7 +164,7 @@ class OrderControllerTest {
         var username = order.getUsername();
         var uuid = UUID.randomUUID().toString();
         var order2 = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.ITEM_NOT_AVAILABLE, null, null);
-        var notAvailableItem = TestUtils.mockNotAvailableItem(item, item.getOrderQuantity() + RandomUtils.nextInt(1, 10));
+        var notAvailableItem = TestUtils.mockNotAvailableItem(item, RandomUtils.nextInt(0, item.getOrderQuantity() - 1));
         var notAvailableItem1 = TestUtils.mockNotAvailableItem(item1, null);
         var orderDetail2 = ItemNotAvailableEventPayload.builder()
                 .orderUuid(uuid)
