@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public Object placeOrderKafka(OrderRequest request) throws JsonProcessingException {
+    public MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException {
         var order = Order.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(AppSecurityUtils.getUsername())
@@ -85,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Object getOrderStatusByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
+    public OrderDto getOrderStatusByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
         var order = orderRepository.findFirstByUuidOrderByIdDesc(uuid).orElseThrow(()
                 -> new AppNotFoundException(String.format("order with uuid '%s'", uuid)));
         var orderDto = modelMapper.map(order, OrderDto.class);
@@ -94,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Object getOrderHistoryByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
+    public List<OrderDto> getOrderHistoryByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
         List<Order> orderList = orderRepository.findByUuidOrderByIdDesc(uuid);
         if (orderList.isEmpty()) {
             throw new AppNotFoundException(String.format("order with uuid '%s'", uuid));

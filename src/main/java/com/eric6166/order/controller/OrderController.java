@@ -1,8 +1,11 @@
 package com.eric6166.order.controller;
 
 import com.eric6166.base.dto.AppResponse;
+import com.eric6166.base.dto.MessageResponse;
 import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.utils.BaseConst;
+import com.eric6166.jpa.dto.PageResponse;
+import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
 import com.eric6166.order.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @Validated
@@ -36,29 +41,29 @@ public class OrderController {
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/place-order-kafka")
-    public ResponseEntity<Object> placeOrderKafka(@RequestBody OrderRequest request) throws JsonProcessingException {
+    public ResponseEntity<AppResponse<MessageResponse>> placeOrderKafka(@RequestBody OrderRequest request) throws JsonProcessingException {
         return ResponseEntity.ok(new AppResponse<>(orderService.placeOrderKafka(request)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/status/uuid/{uuid}")
-    public ResponseEntity<Object> getOrderStatusByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
+    public ResponseEntity<AppResponse<OrderDto>> getOrderStatusByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
         return ResponseEntity.ok(new AppResponse<>(orderService.getOrderStatusByUuid(uuid)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/history/uuid/{uuid}")
-    public ResponseEntity<Object> getOrderHistoryByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
+    public ResponseEntity<AppResponse<List<OrderDto>>> getOrderHistoryByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
         return ResponseEntity.ok(new AppResponse<>(orderService.getOrderHistoryByUuid(uuid)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/history/username/{username}")
-    public ResponseEntity<Object> getOrderHistoryByUsername(@PathVariable String username,
-                                                            @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
+    public ResponseEntity<AppResponse<PageResponse<OrderDto>>> getOrderHistoryByUsername(@PathVariable String username,
+                                                                                         @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
                                                             @Min(value = BaseConst.DEFAULT_PAGE_NUMBER)
                                                             @Max(value = BaseConst.DEFAULT_MAX_INTEGER) Integer pageNumber,
-                                                            @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
+                                                                                         @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
                                                                 @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
                                                                 @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
                                                             ) throws JsonProcessingException {
