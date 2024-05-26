@@ -174,7 +174,6 @@ class OrderServiceImplTest {
         var uuid = UUID.randomUUID().toString();
         var e = Assertions.assertThrows(AppNotFoundException.class,
                 () -> {
-//                    List<Order> empty = new ArrayList<>();
                     Mockito.when(orderRepository.findByUuidOrderByIdDesc(uuid)).thenReturn(new ArrayList<>());
                     orderService.getOrderHistoryByUuid(uuid);
                 });

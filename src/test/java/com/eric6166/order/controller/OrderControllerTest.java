@@ -191,7 +191,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void getOrderHistoryByUsername_thenReturnNoContent() throws Exception {
+    void getOrderHistoryByUsername_givenDataHasNoContent_thenReturnNoContent() throws Exception {
         var username = order.getUsername();
         var pageNumber = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_NUMBER, BaseConst.DEFAULT_MAX_INTEGER);
         var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
@@ -215,7 +215,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void getOrderHistoryByUsername_thenThrowConstraintViolationException() {
+    void getOrderHistoryByUsername_givenPageNumberLessThan1_thenThrowConstraintViolationException() {
         var servletException = Assertions.assertThrows(ServletException.class,
                 () -> {
                     var username = order.getUsername();
