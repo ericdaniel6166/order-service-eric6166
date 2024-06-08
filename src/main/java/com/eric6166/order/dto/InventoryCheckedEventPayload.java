@@ -19,6 +19,7 @@ public class InventoryCheckedEventPayload {
     String orderUuid;
     String username;
     List<Item> itemList;
+    String orderDate;
 
     @Builder
     @Data

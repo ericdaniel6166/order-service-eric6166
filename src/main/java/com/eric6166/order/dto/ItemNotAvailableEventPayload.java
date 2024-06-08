@@ -18,6 +18,7 @@ public class ItemNotAvailableEventPayload {
     String orderUuid;
     String username;
     List<Item> itemList;
+    String orderDate;
 
     @Data
     @FieldDefaults(level = AccessLevel.PRIVATE)

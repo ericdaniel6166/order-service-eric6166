@@ -18,6 +18,7 @@ public class PlaceOrderEventPayload {
     String orderUuid;
     String username;
     List<Item> itemList;
+    String orderDate;
 
     @Builder
     @AllArgsConstructor

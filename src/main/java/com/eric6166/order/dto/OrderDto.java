@@ -13,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
@@ -28,7 +29,8 @@ public class OrderDto extends BaseEntity<String> implements Serializable {
     Long id;
     String uuid;
     String username;
-    String status;
+    String orderStatus;
+    LocalDateTime orderDate;
     BigDecimal totalAmount;
     Object orderDetail;
 }

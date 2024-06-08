@@ -15,7 +15,7 @@ public interface OrderService {
 
     MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException;
 
-    void handleOrderEvent(String orderUuid, String username, Object payload, OrderStatus itemNotAvailable, BigDecimal totalAmount) throws JsonProcessingException;
+    void handleOrderEvent(String orderUuid, String username, Object payload, String orderDate, OrderStatus orderStatus, BigDecimal totalAmount) throws JsonProcessingException;
 
     OrderDto getOrderStatusByUuid(String uuid) throws AppNotFoundException, JsonProcessingException;
 

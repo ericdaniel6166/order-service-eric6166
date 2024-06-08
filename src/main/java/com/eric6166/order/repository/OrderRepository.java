@@ -11,14 +11,22 @@ import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    Optional<Order> findFirstByUuidOrderByIdDesc(String uuid);
+    Optional<Order> findFirstByUuidOrderByOrderStatusValueDesc(String uuid);
 
-    List<Order> findByUuidOrderByIdDesc(String uuid);
+    List<Order> findByUuidOrderByOrderStatusValueDesc(String uuid);
 
-    @Query("""
-            select o from Order o 
-            where o.username = :username and o.id in 
-            (select max(o1.id) from Order o1 where o1.username = :username group by o1.uuid)
-            """)
+    @Query(value = """
+            SELECT O.*
+            FROM T_ORDER O
+                     JOIN (
+                SELECT O1.ORDER_DATE, MAX(O1.ORDER_STATUS_VALUE) AS MAX_STATUS
+                FROM T_ORDER O1
+                WHERE O1.USERNAME = :username
+                GROUP BY O1.ORDER_DATE
+            ) O2
+                          ON O.USERNAME = :username
+                                 AND O.ORDER_DATE = O2.ORDER_DATE
+                                 AND O.ORDER_STATUS_VALUE = O2.MAX_STATUS
+            """, nativeQuery = true)
     Page<Order> findAllOrderByUsername(String username, Pageable pageable);
 }

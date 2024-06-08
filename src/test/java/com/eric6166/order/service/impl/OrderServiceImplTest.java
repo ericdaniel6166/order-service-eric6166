@@ -3,6 +3,7 @@ package com.eric6166.order.service.impl;
 import com.eric6166.base.dto.MessageResponse;
 import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.utils.BaseConst;
+import com.eric6166.base.utils.DateTimeUtils;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.jpa.utils.PageUtils;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
@@ -32,13 +33,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -98,12 +95,14 @@ class OrderServiceImplTest {
     @Test
     void placeOrderKafka_thenReturnSuccess() throws JsonProcessingException {
         var username = "customer";
+        var orderDate = LocalDateTime.now();
         var savedOrder = Order.builder()
                 .id(RandomUtils.nextLong(1, 100))
                 .uuid(UUID.randomUUID().toString())
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(orderRequest))
-                .status(OrderStatus.PLACE_ORDER.name())
+                .orderStatusValue(OrderStatus.PLACE_ORDER.getOrderStatusValue())
+                .orderDate(orderDate)
                 .build();
         var placeOrderItem = TestUtils.mockPlaceOrderItem(item);
         var placeOrderItem1 = TestUtils.mockPlaceOrderItem(item1);
@@ -119,7 +118,7 @@ class OrderServiceImplTest {
 
         var actual = orderService.placeOrderKafka(orderRequest);
 
-        Assertions.assertEquals(expected,actual);
+        Assertions.assertEquals(expected, actual);
     }
 
 
@@ -130,17 +129,20 @@ class OrderServiceImplTest {
         var inventoryCheckedItem = TestUtils.mockInventoryCheckedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var inventoryCheckedItem1 = TestUtils.mockInventoryCheckedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var payload = TestUtils.mockInventoryCheckedEventPayload(uuid, username, inventoryCheckedItem, inventoryCheckedItem1);
+        var orderDate = LocalDateTime.now();
+        var orderDateStr = DateTimeUtils.toString(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER);
         var orderStatus = OrderStatus.INVENTORY_CHECKED;
         BigDecimal totalAmount = null;
         var order = Order.builder()
                 .uuid(uuid)
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(payload))
-                .status(orderStatus.name())
+                .orderStatusValue(orderStatus.getOrderStatusValue())
+                .orderDate(orderDate)
                 .totalAmount(totalAmount)
                 .build();
 
-        orderService.handleOrderEvent(uuid, username, payload, orderStatus, totalAmount);
+        orderService.handleOrderEvent(uuid, username, payload, orderDateStr, orderStatus, totalAmount);
 
         Mockito.verify(orderRepository, Mockito.times(1)).saveAndFlush(order);
     }
@@ -148,7 +150,7 @@ class OrderServiceImplTest {
     @Test
     void getOrderStatusByUuid_thenReturnSuccess() throws AppNotFoundException, JsonProcessingException {
         var uuid = UUID.randomUUID().toString();
-        Mockito.when(orderRepository.findFirstByUuidOrderByIdDesc(uuid)).thenReturn(Optional.of(order1));
+        Mockito.when(orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(Optional.of(order1));
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         var expected = orderDto1;
         var actual = orderService.getOrderStatusByUuid(uuid);
@@ -160,7 +162,7 @@ class OrderServiceImplTest {
         var uuid = UUID.randomUUID().toString();
         var e = Assertions.assertThrows(AppNotFoundException.class,
                 () -> {
-                    Mockito.when(orderRepository.findFirstByUuidOrderByIdDesc(uuid)).thenReturn(Optional.empty());
+                    Mockito.when(orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(Optional.empty());
                     orderService.getOrderStatusByUuid(uuid);
                 });
 
@@ -174,7 +176,7 @@ class OrderServiceImplTest {
         var uuid = UUID.randomUUID().toString();
         var e = Assertions.assertThrows(AppNotFoundException.class,
                 () -> {
-                    Mockito.when(orderRepository.findByUuidOrderByIdDesc(uuid)).thenReturn(new ArrayList<>());
+                    Mockito.when(orderRepository.findByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(new ArrayList<>());
                     orderService.getOrderHistoryByUuid(uuid);
                 });
 
@@ -186,7 +188,7 @@ class OrderServiceImplTest {
     @Test
     void getOrderHistoryByUuid_thenReturnSuccess() throws AppNotFoundException, JsonProcessingException {
         var uuid = UUID.randomUUID().toString();
-        Mockito.when(orderRepository.findByUuidOrderByIdDesc(uuid)).thenReturn(List.of(order1, order));
+        Mockito.when(orderRepository.findByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(List.of(order1, order));
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         Mockito.when(modelMapper.map(order, OrderDto.class)).thenReturn(orderDto);
         var expected = List.of(orderDto1, orderDto);
@@ -199,7 +201,7 @@ class OrderServiceImplTest {
         var username = "customer";
         var pageNumber = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_NUMBER, BaseConst.DEFAULT_MAX_INTEGER);
         var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
-        var pageable = PageUtils.buildPageable(pageNumber, pageSize, BaseConst.ID, Sort.Direction.DESC.name());
+        var pageable = PageUtils.buildPageable(pageNumber, pageSize, Order.ORDER_DATE_COLUMN, Sort.Direction.DESC.name());
         var orderList = List.of(order1, order);
         var page = new PageImpl<>(orderList, pageable, orderList.size());
         var orderDtoList = List.of(orderDto1, orderDto);

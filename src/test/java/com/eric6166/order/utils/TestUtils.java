@@ -1,5 +1,6 @@
 package com.eric6166.order.utils;
 
+import com.eric6166.base.utils.DateTimeUtils;
 import com.eric6166.order.dto.InventoryCheckedEventPayload;
 import com.eric6166.order.dto.ItemNotAvailableEventPayload;
 import com.eric6166.order.dto.OrderDto;
@@ -9,6 +10,7 @@ import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.model.Order;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public final class TestUtils {
@@ -20,6 +22,7 @@ public final class TestUtils {
     public static InventoryCheckedEventPayload mockInventoryCheckedEventPayload(String uuid, String username, InventoryCheckedEventPayload.Item... inventoryCheckedItems) {
         return InventoryCheckedEventPayload.builder()
                 .orderUuid(uuid)
+                .orderDate(DateTimeUtils.toString(LocalDateTime.now(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
                 .username(username)
                 .itemList(List.of(inventoryCheckedItems))
                 .build();
@@ -51,7 +54,8 @@ public final class TestUtils {
                 .id(id)
                 .uuid(uuid)
                 .username(username)
-                .status(orderStatus.name())
+                .orderStatusValue(orderStatus.getOrderStatusValue())
+                .orderDate(LocalDateTime.now())
                 .orderDetail(orderDetail)
                 .totalAmount(totalAmount)
                 .build();
@@ -62,12 +66,13 @@ public final class TestUtils {
                 .id(order.getId())
                 .uuid(order.getUuid())
                 .username(order.getUsername())
-                .status(order.getStatus())
+                .orderStatus(OrderStatus.fromValue(order.getOrderStatusValue()).name())
                 .totalAmount(order.getTotalAmount())
                 .orderDetail(orderDetail)
                 .build();
 
     }
+
     public static InventoryCheckedEventPayload.Item mockInventoryCheckedItem(OrderRequest.Item item, BigDecimal productPrice) {
         return InventoryCheckedEventPayload.Item.builder()
                 .orderQuantity(item.getOrderQuantity())

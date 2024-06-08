@@ -7,7 +7,6 @@ import com.eric6166.order.dto.ItemNotAvailableEventPayload;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,7 +36,7 @@ public class KafkaConsumer {
             span.tag("ItemNotAvailableEvent uuid", appEvent.getUuid());
             log.info("handleItemNotAvailableEvent, appEvent: {}", appEvent);
             var payload = modelMapper.map(appEvent.getPayload(), ItemNotAvailableEventPayload.class);
-            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, OrderStatus.ITEM_NOT_AVAILABLE, null);
+            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.ITEM_NOT_AVAILABLE, null);
         } catch (RuntimeException e) {
             log.info("e: {} , errorMessage: {}", e.getClass().getName(), e.getMessage()); // comment // for local testing
             span.error(e);
@@ -59,7 +58,7 @@ public class KafkaConsumer {
             span.tag("InventoryCheckedEvent uuid", appEvent.getUuid());
             log.info("handleInventoryCheckedEvent, appEvent: {}", appEvent);
             var payload = modelMapper.map(appEvent.getPayload(), InventoryCheckedEventPayload.class);
-            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, OrderStatus.INVENTORY_CHECKED, null);
+            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_CHECKED, null);
         } catch (RuntimeException e) {
             log.info("e: {} , errorMessage: {}", e.getClass().getName(), e.getMessage()); // comment // for local testing
             span.error(e);
