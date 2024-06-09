@@ -111,7 +111,8 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDto> orderDtoList = new ArrayList<>();
         for (var order : orders) {
             var orderDto = modelMapper.map(order, OrderDto.class);
-            orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
+//            orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
+            orderDto.setOrderDetail(null);
             orderDto.setOrderStatus(OrderStatus.fromValue(order.getOrderStatusValue()).name());
 //            orderDto.setOrderStatus(OrderStatus.fromValue(100).name());
             orderDtoList.add(orderDto);
