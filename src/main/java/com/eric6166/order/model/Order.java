@@ -7,10 +7,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -23,31 +25,30 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Order extends BaseEntity<String> {
-
-    public static final String ORDER_DATE_COLUMN = "ORDER_DATE";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private Long id;
+    Long id;
 
     @Column(name = "UUID", nullable = false)
-    private String uuid;
+    String uuid;
 
     @Column(name = "USERNAME", nullable = false)
-    private String username;
+    String username;
 
-    @Column(name = ORDER_DATE_COLUMN, nullable = false)
-    private LocalDateTime orderDate;
+    @Column(name = "ORDER_DATE", nullable = false)
+    LocalDateTime orderDate;
 
     @Column(name = "ORDER_STATUS_VALUE", nullable = false)
-    private Integer orderStatusValue;
+    Integer orderStatusValue;
 
     @Column(name = "ORDER_DETAIL", columnDefinition = "TEXT")
-    private String orderDetail;
+    String orderDetail;
 
     @Column(name = "TOTAL_AMOUNT", precision = 19, scale = 4)
-    private BigDecimal totalAmount;
+    BigDecimal totalAmount;
 
 }
