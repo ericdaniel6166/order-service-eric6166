@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true")
 public class KafkaProducerProps {
 
-    @Value("${spring.kafka.producers.place-order.topic-name}")
-    String placeOrderTopicName;
+    @Value("${spring.kafka.producers.order-created.topic-name}")
+    String orderCreatedTopicName;
 
 }

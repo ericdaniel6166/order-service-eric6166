@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum OrderStatus {
-    PLACE_ORDER(0),
-    INVENTORY_CHECKED(1),
-    ITEM_NOT_AVAILABLE(2),
+    ORDER_CREATED(0),
+    INVENTORY_RESERVED(1),
+    INVENTORY_RESERVED_FAILED(2),
     ;
 
     private static final Map<Integer, OrderStatus> VALUE_MAP =

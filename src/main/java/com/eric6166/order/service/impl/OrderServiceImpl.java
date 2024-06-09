@@ -6,9 +6,9 @@ import com.eric6166.base.utils.DateTimeUtils;
 import com.eric6166.common.config.kafka.AppEvent;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
+import com.eric6166.order.dto.OrderCreatedEventPayload;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
-import com.eric6166.order.dto.PlaceOrderEventPayload;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.model.Order;
 import com.eric6166.order.repository.OrderRepository;
@@ -52,22 +52,22 @@ public class OrderServiceImpl implements OrderService {
                 .uuid(UUID.randomUUID().toString())
                 .username(AppSecurityUtils.getUsername())
                 .orderDetail(objectMapper.writeValueAsString(request))
-                .orderStatusValue(OrderStatus.PLACE_ORDER.getValue())
+                .orderStatusValue(OrderStatus.ORDER_CREATED.getValue())
                 .orderDate(orderDate)
                 .build();
         var savedOrder = orderRepository.saveAndFlush(order);
-        var placeOrderEvent = AppEvent.builder()
-                .payload(PlaceOrderEventPayload.builder()
+        var orderCreatedEvent = AppEvent.builder()
+                .payload(OrderCreatedEventPayload.builder()
                         .orderDate(DateTimeUtils.toString(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
                         .orderUuid(savedOrder.getUuid())
                         .username(savedOrder.getUsername())
                         .itemList(request.getItemList().stream()
-                                .map(item -> modelMapper.map(item, PlaceOrderEventPayload.Item.class))
+                                .map(item -> modelMapper.map(item, OrderCreatedEventPayload.Item.class))
                                 .toList())
                         .build())
                 .uuid(UUID.randomUUID().toString())
                 .build();
-        kafkaTemplate.send(kafkaProducerProps.getPlaceOrderTopicName(), placeOrderEvent);
+        kafkaTemplate.send(kafkaProducerProps.getOrderCreatedTopicName(), orderCreatedEvent);
         return MessageResponse.builder()
                 .uuid(savedOrder.getUuid())
                 .message("Order Successfully Placed")

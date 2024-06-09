@@ -7,9 +7,9 @@ import com.eric6166.base.utils.DateTimeUtils;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.jpa.utils.PageUtils;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
+import com.eric6166.order.dto.OrderCreatedEventPayload;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
-import com.eric6166.order.dto.PlaceOrderEventPayload;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.model.Order;
 import com.eric6166.order.repository.OrderRepository;
@@ -78,15 +78,15 @@ class OrderServiceImplTest {
         var uuid = UUID.randomUUID().toString();
         var username = "customer";
 
-        order = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.PLACE_ORDER, null, null);
+        order = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.ORDER_CREATED, null, null);
         var orderDetail = TestUtils.mockOrderRequest(item, item1);
         order.setOrderDetail(objectMapper.writeValueAsString(orderDetail));
         orderDto = TestUtils.mockOrderDto(order, orderDetail);
 
-        order1 = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.INVENTORY_CHECKED, null, null);
-        var inventoryCheckedItem = TestUtils.mockInventoryCheckedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
-        var inventoryCheckedItem1 = TestUtils.mockInventoryCheckedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
-        var orderDetail1 = TestUtils.mockInventoryCheckedEventPayload(uuid, username, inventoryCheckedItem, inventoryCheckedItem1);
+        order1 = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.INVENTORY_RESERVED, null, null);
+        var inventoryReservedItem = TestUtils.mockInventoryReservedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
+        var inventoryReservedItem1 = TestUtils.mockInventoryReservedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
+        var orderDetail1 = TestUtils.mockInventoryReservedEventPayload(uuid, username, inventoryReservedItem, inventoryReservedItem1);
         order1.setOrderDetail(objectMapper.writeValueAsString(orderDetail1));
         orderDto1 = TestUtils.mockOrderDto(order1, orderDetail1);
     }
@@ -100,19 +100,19 @@ class OrderServiceImplTest {
                 .uuid(UUID.randomUUID().toString())
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(orderRequest))
-                .orderStatusValue(OrderStatus.PLACE_ORDER.getValue())
+                .orderStatusValue(OrderStatus.ORDER_CREATED.getValue())
                 .orderDate(orderDate)
                 .build();
-        var placeOrderItem = TestUtils.mockPlaceOrderItem(item);
-        var placeOrderItem1 = TestUtils.mockPlaceOrderItem(item1);
+        var orderCreatedItem = TestUtils.mockOrderCreatedItem(item);
+        var orderCreatedItem1 = TestUtils.mockOrderCreatedItem(item1);
         var expected = MessageResponse.builder()
                 .uuid(savedOrder.getUuid())
                 .message("Order Successfully Placed")
                 .build();
 
         Mockito.when(orderRepository.saveAndFlush(Mockito.any(Order.class))).thenReturn(savedOrder);
-        Mockito.when(modelMapper.map(item, PlaceOrderEventPayload.Item.class)).thenReturn(placeOrderItem);
-        Mockito.when(modelMapper.map(item1, PlaceOrderEventPayload.Item.class)).thenReturn(placeOrderItem1);
+        Mockito.when(modelMapper.map(item, OrderCreatedEventPayload.Item.class)).thenReturn(orderCreatedItem);
+        Mockito.when(modelMapper.map(item1, OrderCreatedEventPayload.Item.class)).thenReturn(orderCreatedItem1);
         Mockito.mockStatic(AppSecurityUtils.class).when(AppSecurityUtils::getUsername).thenReturn(username);
 
         var actual = orderService.placeOrderKafka(orderRequest);
@@ -125,12 +125,12 @@ class OrderServiceImplTest {
     void handleOrderEvent_thenReturnSuccess() throws JsonProcessingException {
         var username = "customer";
         var uuid = UUID.randomUUID().toString();
-        var inventoryCheckedItem = TestUtils.mockInventoryCheckedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
-        var inventoryCheckedItem1 = TestUtils.mockInventoryCheckedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
-        var payload = TestUtils.mockInventoryCheckedEventPayload(uuid, username, inventoryCheckedItem, inventoryCheckedItem1);
+        var inventoryReservedItem = TestUtils.mockInventoryReservedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
+        var inventoryReservedItem1 = TestUtils.mockInventoryReservedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
+        var payload = TestUtils.mockInventoryReservedEventPayload(uuid, username, inventoryReservedItem, inventoryReservedItem1);
         var orderDate = LocalDateTime.now();
         var orderDateStr = DateTimeUtils.toString(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER);
-        var orderStatus = OrderStatus.INVENTORY_CHECKED;
+        var orderStatus = OrderStatus.INVENTORY_RESERVED;
         BigDecimal totalAmount = null;
         var order = Order.builder()
                 .uuid(uuid)

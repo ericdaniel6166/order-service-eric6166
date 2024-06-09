@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class InventoryCheckedEventPayload {
+public class InventoryReservedEventPayload {
     String orderUuid;
     String username;
     List<Item> itemList;

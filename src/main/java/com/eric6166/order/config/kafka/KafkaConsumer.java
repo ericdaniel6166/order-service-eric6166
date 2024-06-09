@@ -2,8 +2,8 @@ package com.eric6166.order.config.kafka;
 
 import brave.Tracer;
 import com.eric6166.common.config.kafka.AppEvent;
-import com.eric6166.order.dto.InventoryCheckedEventPayload;
-import com.eric6166.order.dto.ItemNotAvailableEventPayload;
+import com.eric6166.order.dto.InventoryReservedEventPayload;
+import com.eric6166.order.dto.InventoryReservedFailedEventPayload;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,18 +25,18 @@ public class KafkaConsumer {
     OrderService orderService;
     ModelMapper modelMapper;
 
-    @KafkaListener(topics = "${spring.kafka.consumers.item-not-available.topic-name}",
-            groupId = "${spring.kafka.consumers.item-not-available.group-id}",
-            containerFactory = "itemNotAvailableKafkaListenerContainerFactory",
-            concurrency = "${spring.kafka.consumers.item-not-available.properties.concurrency}"
+    @KafkaListener(topics = "${spring.kafka.consumers.inventory-reserved-failed.topic-name}",
+            groupId = "${spring.kafka.consumers.inventory-reserved-failed.group-id}",
+            containerFactory = "inventoryReservedFailedKafkaListenerContainerFactory",
+            concurrency = "${spring.kafka.consumers.inventory-reserved-failed.properties.concurrency}"
     )
-    public void handleItemNotAvailableEvent(AppEvent appEvent) throws JsonProcessingException {
-        var span = tracer.nextSpan().name("handleItemNotAvailableEvent").start();
+    public void handleInventoryReservedFailedEvent(AppEvent appEvent) throws JsonProcessingException {
+        var span = tracer.nextSpan().name("handleInventoryReservedFailedEvent").start();
         try (var ws = tracer.withSpanInScope(span)) {
-            span.tag("ItemNotAvailableEvent uuid", appEvent.getUuid());
-            log.info("handleItemNotAvailableEvent, appEvent: {}", appEvent);
-            var payload = modelMapper.map(appEvent.getPayload(), ItemNotAvailableEventPayload.class);
-            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.ITEM_NOT_AVAILABLE, null);
+            span.tag("InventoryReservedFailedEvent uuid", appEvent.getUuid());
+            log.info("handleInventoryReservedFailed, appEvent: {}", appEvent);
+            var payload = modelMapper.map(appEvent.getPayload(), InventoryReservedFailedEventPayload.class);
+            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_RESERVED_FAILED, null);
         } catch (RuntimeException e) {
             log.info("e: {} , errorMessage: {}", e.getClass().getName(), e.getMessage()); // comment // for local testing
             span.error(e);
@@ -47,18 +47,18 @@ public class KafkaConsumer {
 
     }
 
-    @KafkaListener(topics = "${spring.kafka.consumers.inventory-checked.topic-name}",
-            groupId = "${spring.kafka.consumers.inventory-checked.group-id}",
-            containerFactory = "inventoryCheckedGroupIdKafkaListenerContainerFactory",
-            concurrency = "${spring.kafka.consumers.inventory-checked.properties.concurrency}"
+    @KafkaListener(topics = "${spring.kafka.consumers.inventory-reserved.topic-name}",
+            groupId = "${spring.kafka.consumers.inventory-reserved.group-id}",
+            containerFactory = "inventoryReservedGroupIdKafkaListenerContainerFactory",
+            concurrency = "${spring.kafka.consumers.inventory-reserved.properties.concurrency}"
     )
-    public void handleInventoryCheckedEvent(AppEvent appEvent) throws JsonProcessingException {
-        var span = tracer.nextSpan().name("handleInventoryCheckedEvent").start();
+    public void handleInventoryReservedEvent(AppEvent appEvent) throws JsonProcessingException {
+        var span = tracer.nextSpan().name("handleInventoryReservedEvent").start();
         try (var ws = tracer.withSpanInScope(span)) {
-            span.tag("InventoryCheckedEvent uuid", appEvent.getUuid());
-            log.info("handleInventoryCheckedEvent, appEvent: {}", appEvent);
-            var payload = modelMapper.map(appEvent.getPayload(), InventoryCheckedEventPayload.class);
-            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_CHECKED, null);
+            span.tag("InventoryReservedEvent uuid", appEvent.getUuid());
+            log.info("handleInventoryReservedEvent, appEvent: {}", appEvent);
+            var payload = modelMapper.map(appEvent.getPayload(), InventoryReservedEventPayload.class);
+            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_RESERVED, null);
         } catch (RuntimeException e) {
             log.info("e: {} , errorMessage: {}", e.getClass().getName(), e.getMessage()); // comment // for local testing
             span.error(e);

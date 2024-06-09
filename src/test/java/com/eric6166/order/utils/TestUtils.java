@@ -1,11 +1,11 @@
 package com.eric6166.order.utils;
 
 import com.eric6166.base.utils.DateTimeUtils;
-import com.eric6166.order.dto.InventoryCheckedEventPayload;
-import com.eric6166.order.dto.ItemNotAvailableEventPayload;
+import com.eric6166.order.dto.InventoryReservedEventPayload;
+import com.eric6166.order.dto.InventoryReservedFailedEventPayload;
+import com.eric6166.order.dto.OrderCreatedEventPayload;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
-import com.eric6166.order.dto.PlaceOrderEventPayload;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.model.Order;
 
@@ -19,17 +19,17 @@ public final class TestUtils {
         throw new IllegalStateException("Utility class");
     }
 
-    public static InventoryCheckedEventPayload mockInventoryCheckedEventPayload(String uuid, String username, InventoryCheckedEventPayload.Item... inventoryCheckedItems) {
-        return InventoryCheckedEventPayload.builder()
+    public static InventoryReservedEventPayload mockInventoryReservedEventPayload(String uuid, String username, InventoryReservedEventPayload.Item... inventoryReservedItems) {
+        return InventoryReservedEventPayload.builder()
                 .orderUuid(uuid)
                 .orderDate(DateTimeUtils.toString(LocalDateTime.now(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
                 .username(username)
-                .itemList(List.of(inventoryCheckedItems))
+                .itemList(List.of(inventoryReservedItems))
                 .build();
     }
 
-    public static PlaceOrderEventPayload.Item mockPlaceOrderItem(OrderRequest.Item item) {
-        return PlaceOrderEventPayload.Item.builder()
+    public static OrderCreatedEventPayload.Item mockOrderCreatedItem(OrderRequest.Item item) {
+        return OrderCreatedEventPayload.Item.builder()
                 .productId(item.getProductId())
                 .orderQuantity(item.getOrderQuantity())
                 .build();
@@ -73,16 +73,16 @@ public final class TestUtils {
 
     }
 
-    public static InventoryCheckedEventPayload.Item mockInventoryCheckedItem(OrderRequest.Item item, BigDecimal productPrice) {
-        return InventoryCheckedEventPayload.Item.builder()
+    public static InventoryReservedEventPayload.Item mockInventoryReservedItem(OrderRequest.Item item, BigDecimal productPrice) {
+        return InventoryReservedEventPayload.Item.builder()
                 .orderQuantity(item.getOrderQuantity())
                 .productId(item.getProductId())
                 .productPrice(productPrice)
                 .build();
     }
 
-    public static ItemNotAvailableEventPayload.Item mockNotAvailableItem(OrderRequest.Item item, Integer inventoryQuantity) {
-        return ItemNotAvailableEventPayload.Item.builder()
+    public static InventoryReservedFailedEventPayload.Item mockInventoryReservedFailedItem(OrderRequest.Item item, Integer inventoryQuantity) {
+        return InventoryReservedFailedEventPayload.Item.builder()
                 .productId(item.getProductId())
                 .orderQuantity(item.getOrderQuantity())
                 .inventoryQuantity(inventoryQuantity)

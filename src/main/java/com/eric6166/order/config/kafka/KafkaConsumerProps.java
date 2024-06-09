@@ -16,11 +16,11 @@ import org.springframework.context.annotation.Configuration;
 public class KafkaConsumerProps {
 
 
-    @Value("${spring.kafka.consumers.item-not-available.group-id}")
-    String itemNotAvailableGroupId;
+    @Value("${spring.kafka.consumers.inventory-reserved-failed.group-id}")
+    String inventoryReservedFailedGroupId;
 
-    @Value("${spring.kafka.consumers.inventory-checked.group-id}")
-    String inventoryCheckedGroupId;
+    @Value("${spring.kafka.consumers.inventory-reserved.group-id}")
+    String inventoryReservedGroupId;
 
 
 }

@@ -6,7 +6,7 @@ import com.eric6166.base.utils.BaseConst;
 import com.eric6166.base.utils.TestConst;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.jpa.utils.PageUtils;
-import com.eric6166.order.dto.ItemNotAvailableEventPayload;
+import com.eric6166.order.dto.InventoryReservedFailedEventPayload;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
 import com.eric6166.order.enums.OrderStatus;
@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -76,15 +75,15 @@ class OrderControllerTest {
         var uuid = UUID.randomUUID().toString();
         var username = "customer";
 
-        order = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.PLACE_ORDER, null, null);
+        order = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.ORDER_CREATED, null, null);
         var orderDetail = TestUtils.mockOrderRequest(item, item1);
         order.setOrderDetail(objectMapper.writeValueAsString(orderDetail));
         orderDto = TestUtils.mockOrderDto(order, orderDetail);
 
-        order1 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.INVENTORY_CHECKED, null, null);
-        var inventoryCheckedItem = TestUtils.mockInventoryCheckedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
-        var inventoryCheckedItem1 = TestUtils.mockInventoryCheckedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
-        var orderDetail1 = TestUtils.mockInventoryCheckedEventPayload(uuid, username, inventoryCheckedItem, inventoryCheckedItem1);
+        order1 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.INVENTORY_RESERVED, null, null);
+        var inventoryReservedItem = TestUtils.mockInventoryReservedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
+        var inventoryReservedItem1 = TestUtils.mockInventoryReservedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
+        var orderDetail1 = TestUtils.mockInventoryReservedEventPayload(uuid, username, inventoryReservedItem, inventoryReservedItem1);
         order1.setOrderDetail(objectMapper.writeValueAsString(orderDetail1));
         orderDto1 = TestUtils.mockOrderDto(order1, orderDetail1);
     }
@@ -156,13 +155,13 @@ class OrderControllerTest {
     void getOrderHistoryByUsername_thenReturnOk() throws Exception {
         var username = order.getUsername();
         var uuid = UUID.randomUUID().toString();
-        var order2 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.ITEM_NOT_AVAILABLE, null, null);
-        var notAvailableItem = TestUtils.mockNotAvailableItem(item, RandomUtils.nextInt(0, item.getOrderQuantity() - 1));
-        var notAvailableItem1 = TestUtils.mockNotAvailableItem(item1, null);
-        var orderDetail2 = ItemNotAvailableEventPayload.builder()
+        var order2 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.INVENTORY_RESERVED_FAILED, null, null);
+        var inventoryReservedFailedItem = TestUtils.mockInventoryReservedFailedItem(item, RandomUtils.nextInt(0, item.getOrderQuantity() - 1));
+        var inventoryReservedFailedItem1 = TestUtils.mockInventoryReservedFailedItem(item1, null);
+        var orderDetail2 = InventoryReservedFailedEventPayload.builder()
                 .orderUuid(uuid)
                 .username(username)
-                .itemList(List.of(notAvailableItem, notAvailableItem1))
+                .itemList(List.of(inventoryReservedFailedItem, inventoryReservedFailedItem1))
                 .build();
         order2.setOrderDetail(objectMapper.writeValueAsString(orderDetail2));
         var orderDto2 = TestUtils.mockOrderDto(order2, orderDetail2);

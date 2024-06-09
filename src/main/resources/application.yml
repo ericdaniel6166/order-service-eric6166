@@ -97,17 +97,17 @@ spring:
     enabled: true
     bootstrap-servers: ${app.kafka.hostname}:${app.kafka.port}
     producers:
-      place-order:
-        topic-name: place-order
+      order-created:
+        topic-name: order-created
     consumers:
-      item-not-available:
-        topic-name: item-not-available
-        group-id: item-not-available-${spring.application.name}
+      inventory-reserved-failed:
+        topic-name: inventory-reserved-failed
+        group-id: inventory-reserved-failed-${spring.application.name}
         properties:
           concurrency: ${app.kafka.template.consumer.properties.concurrency}
-      inventory-checked:
-        topic-name: inventory-checked
-        group-id: inventory-checked-${spring.application.name}
+      inventory-reserved:
+        topic-name: inventory-reserved
+        group-id: inventory-reserved-${spring.application.name}
         properties:
           concurrency: ${app.kafka.template.consumer.properties.concurrency}
 

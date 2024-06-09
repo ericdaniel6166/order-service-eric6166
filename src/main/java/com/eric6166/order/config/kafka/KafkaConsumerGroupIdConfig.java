@@ -18,13 +18,13 @@ public class KafkaConsumerGroupIdConfig {
     KafkaConsumerProps kafkaConsumerProps;
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> itemNotAvailableKafkaListenerContainerFactory() {
-        return kafkaConsumerConfig.kafkaListenerContainerFactory(kafkaConsumerProps.getItemNotAvailableGroupId());
+    public ConcurrentKafkaListenerContainerFactory<String, Object> inventoryReservedFailedKafkaListenerContainerFactory() {
+        return kafkaConsumerConfig.kafkaListenerContainerFactory(kafkaConsumerProps.getInventoryReservedFailedGroupId());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> inventoryCheckedGroupIdKafkaListenerContainerFactory() {
-        return kafkaConsumerConfig.kafkaListenerContainerFactory(kafkaConsumerProps.getInventoryCheckedGroupId());
+    public ConcurrentKafkaListenerContainerFactory<String, Object> inventoryReservedGroupIdKafkaListenerContainerFactory() {
+        return kafkaConsumerConfig.kafkaListenerContainerFactory(kafkaConsumerProps.getInventoryReservedGroupId());
     }
 
 
