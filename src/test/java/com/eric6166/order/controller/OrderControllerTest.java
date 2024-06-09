@@ -168,7 +168,7 @@ class OrderControllerTest {
         var orderDto2 = TestUtils.mockOrderDto(order2, orderDetail2);
         var pageNumber = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_NUMBER, BaseConst.DEFAULT_MAX_INTEGER);
         var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
-        var pageable = PageUtils.buildPageable(pageNumber, pageSize, BaseConst.ID, Sort.Direction.DESC.name());
+        var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
         var orderDtoList = List.of(orderDto2, orderDto1);
         var pageResponse = new PageResponse<>(orderDtoList, new PageImpl<>(orderDtoList, pageable, orderDtoList.size()));
         var expected = new AppResponse<>(pageResponse);
@@ -195,7 +195,7 @@ class OrderControllerTest {
         var username = order.getUsername();
         var pageNumber = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_NUMBER, BaseConst.DEFAULT_MAX_INTEGER);
         var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
-        var pageable = PageUtils.buildPageable(pageNumber, pageSize, BaseConst.ID, Sort.Direction.DESC.name());
+        var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
         List<OrderDto> orderDtoList = new ArrayList<>();
         var pageResponse = new PageResponse<>(orderDtoList, new PageImpl<>(orderDtoList, pageable, orderDtoList.size()));
 

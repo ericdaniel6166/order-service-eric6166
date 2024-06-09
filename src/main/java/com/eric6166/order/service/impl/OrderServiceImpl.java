@@ -5,7 +5,6 @@ import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.utils.DateTimeUtils;
 import com.eric6166.common.config.kafka.AppEvent;
 import com.eric6166.jpa.dto.PageResponse;
-import com.eric6166.jpa.utils.PageUtils;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Sort;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
                 .uuid(UUID.randomUUID().toString())
                 .username(AppSecurityUtils.getUsername())
                 .orderDetail(objectMapper.writeValueAsString(request))
-                .orderStatusValue(OrderStatus.PLACE_ORDER.getOrderStatusValue())
+                .orderStatusValue(OrderStatus.PLACE_ORDER.getValue())
                 .orderDate(orderDate)
                 .build();
         var savedOrder = orderRepository.saveAndFlush(order);
@@ -84,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(payload))
                 .orderDate(DateTimeUtils.toLocalDateTime(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
-                .orderStatusValue(orderStatus.getOrderStatusValue())
+                .orderStatusValue(orderStatus.getValue())
                 .totalAmount(totalAmount)
                 .build();
         orderRepository.saveAndFlush(order);
@@ -102,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrderHistoryByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
-        List<Order> orderList = orderRepository.findByUuidOrderByOrderStatusValueDesc(uuid);
+        var orderList = orderRepository.findByUuidOrderByOrderStatusValueDesc(uuid);
         if (orderList.isEmpty()) {
             throw new AppNotFoundException(String.format("order with uuid '%s'", uuid));
         }
@@ -115,6 +113,7 @@ public class OrderServiceImpl implements OrderService {
             var orderDto = modelMapper.map(order, OrderDto.class);
             orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
             orderDto.setOrderStatus(OrderStatus.fromValue(order.getOrderStatusValue()).name());
+//            orderDto.setOrderStatus(OrderStatus.fromValue(100).name());
             orderDtoList.add(orderDto);
         }
         return orderDtoList;
@@ -122,8 +121,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException {
-        var pageable = PageUtils.buildPageable(pageNumber, pageSize, Order.ORDER_DATE_COLUMN, Sort.Direction.DESC.name());
-        var page = orderRepository.findAllOrderByUsername(username, pageable);
+        var page = orderRepository.findAllOrderByUsername(username, pageNumber, pageSize);
         var orderDtoList = buildOrderDtoList(page);
         return new PageResponse<>(orderDtoList, page);
     }

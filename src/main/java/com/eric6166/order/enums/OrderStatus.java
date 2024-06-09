@@ -5,7 +5,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
@@ -16,22 +20,21 @@ public enum OrderStatus {
     ITEM_NOT_AVAILABLE(2),
     ;
 
-    Integer orderStatusValue;
+    private static final Map<Integer, OrderStatus> VALUE_MAP =
+            Arrays.stream(OrderStatus.values())
+                    .collect(Collectors.toMap(OrderStatus::getValue, Function.identity()));
+    Integer value;
 
     public static OrderStatus fromValue(Integer value) {
-        for (OrderStatus orderStatus : OrderStatus.class.getEnumConstants()) {
-            if (orderStatus.orderStatusValue.equals(value))
-                return orderStatus;
+        var orderStatus = fromValueOptional(value);
+        if (orderStatus.isPresent()) {
+            return orderStatus.get();
         }
         throw new IllegalArgumentException(String.format("value '%s' is not a valid OrderStatus value", value));
     }
 
     public static Optional<OrderStatus> fromValueOptional(Integer value) {
-        try {
-            return Optional.of(fromValue(value));
-        } catch (IllegalArgumentException e) {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(VALUE_MAP.get(value));
     }
 
 }

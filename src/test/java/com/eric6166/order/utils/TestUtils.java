@@ -54,7 +54,7 @@ public final class TestUtils {
                 .id(id)
                 .uuid(uuid)
                 .username(username)
-                .orderStatusValue(orderStatus.getOrderStatusValue())
+                .orderStatusValue(orderStatus.getValue())
                 .orderDate(LocalDateTime.now())
                 .orderDetail(orderDetail)
                 .totalAmount(totalAmount)

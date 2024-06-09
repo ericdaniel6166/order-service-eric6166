@@ -31,7 +31,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Sort;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.math.BigDecimal;
@@ -101,7 +100,7 @@ class OrderServiceImplTest {
                 .uuid(UUID.randomUUID().toString())
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(orderRequest))
-                .orderStatusValue(OrderStatus.PLACE_ORDER.getOrderStatusValue())
+                .orderStatusValue(OrderStatus.PLACE_ORDER.getValue())
                 .orderDate(orderDate)
                 .build();
         var placeOrderItem = TestUtils.mockPlaceOrderItem(item);
@@ -137,7 +136,7 @@ class OrderServiceImplTest {
                 .uuid(uuid)
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(payload))
-                .orderStatusValue(orderStatus.getOrderStatusValue())
+                .orderStatusValue(orderStatus.getValue())
                 .orderDate(orderDate)
                 .totalAmount(totalAmount)
                 .build();
@@ -201,13 +200,13 @@ class OrderServiceImplTest {
         var username = "customer";
         var pageNumber = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_NUMBER, BaseConst.DEFAULT_MAX_INTEGER);
         var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
-        var pageable = PageUtils.buildPageable(pageNumber, pageSize, Order.ORDER_DATE_COLUMN, Sort.Direction.DESC.name());
+        var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
         var orderList = List.of(order1, order);
         var page = new PageImpl<>(orderList, pageable, orderList.size());
         var orderDtoList = List.of(orderDto1, orderDto);
         var expected = new PageResponse<>(orderDtoList, new PageImpl<>(orderList, pageable, orderDtoList.size()));
 
-        Mockito.when(orderRepository.findAllOrderByUsername(username, pageable)).thenReturn(page);
+        Mockito.when(orderRepository.findAllOrderByUsername(username, pageNumber, pageSize)).thenReturn(page);
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         Mockito.when(modelMapper.map(order, OrderDto.class)).thenReturn(orderDto);
 

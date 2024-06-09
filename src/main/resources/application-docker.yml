@@ -24,3 +24,4 @@ logging:
     root: INFO
     com.eric6166: INFO
     org.apache.http: INFO
+#    org.springframework.jdbc.core.StatementCreatorUtils: INFO # disable log input parameter

@@ -24,7 +24,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Order extends BaseEntity<String> {
+
     public static final String ORDER_DATE_COLUMN = "ORDER_DATE";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -36,11 +38,11 @@ public class Order extends BaseEntity<String> {
     @Column(name = "USERNAME", nullable = false)
     private String username;
 
+    @Column(name = ORDER_DATE_COLUMN, nullable = false)
+    private LocalDateTime orderDate;
+
     @Column(name = "ORDER_STATUS_VALUE", nullable = false)
     private Integer orderStatusValue;
-
-    @Column(name = ORDER_DATE_COLUMN)
-    private LocalDateTime orderDate;
 
     @Column(name = "ORDER_DETAIL", columnDefinition = "TEXT")
     private String orderDetail;
