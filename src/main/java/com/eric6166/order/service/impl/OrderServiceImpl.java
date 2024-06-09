@@ -89,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto getOrderStatusByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
+    public OrderDto getOrderByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
         var order = orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid).orElseThrow(()
                 -> new AppNotFoundException(String.format("order with uuid '%s'", uuid)));
         var orderDto = modelMapper.map(order, OrderDto.class);

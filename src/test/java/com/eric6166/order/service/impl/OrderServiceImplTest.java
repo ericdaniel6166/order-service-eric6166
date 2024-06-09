@@ -152,7 +152,7 @@ class OrderServiceImplTest {
         Mockito.when(orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(Optional.of(order1));
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         var expected = orderDto1;
-        var actual = orderService.getOrderStatusByUuid(uuid);
+        var actual = orderService.getOrderByUuid(uuid);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -162,7 +162,7 @@ class OrderServiceImplTest {
         var e = Assertions.assertThrows(AppNotFoundException.class,
                 () -> {
                     Mockito.when(orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(Optional.empty());
-                    orderService.getOrderStatusByUuid(uuid);
+                    orderService.getOrderByUuid(uuid);
                 });
 
         var expected = String.format("order with uuid '%s' not found", uuid);

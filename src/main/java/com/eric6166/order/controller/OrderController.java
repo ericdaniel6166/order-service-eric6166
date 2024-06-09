@@ -46,9 +46,9 @@ public class OrderController {
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
-    @GetMapping("/status/uuid/{uuid}")
-    public ResponseEntity<AppResponse<OrderDto>> getOrderStatusByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
-        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderStatusByUuid(uuid)));
+    @GetMapping("/uuid/{uuid}")
+    public ResponseEntity<AppResponse<OrderDto>> getOrderByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
+        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderByUuid(uuid)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))

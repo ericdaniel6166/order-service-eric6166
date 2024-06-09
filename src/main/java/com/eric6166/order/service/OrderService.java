@@ -17,7 +17,7 @@ public interface OrderService {
 
     void handleOrderEvent(String orderUuid, String username, Object payload, String orderDate, OrderStatus orderStatus, BigDecimal totalAmount) throws JsonProcessingException;
 
-    OrderDto getOrderStatusByUuid(String uuid) throws AppNotFoundException, JsonProcessingException;
+    OrderDto getOrderByUuid(String uuid) throws AppNotFoundException, JsonProcessingException;
 
     List<OrderDto> getOrderHistoryByUuid(String uuid) throws AppNotFoundException, JsonProcessingException;
 

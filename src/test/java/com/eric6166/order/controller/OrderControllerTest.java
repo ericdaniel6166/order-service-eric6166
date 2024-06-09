@@ -115,7 +115,7 @@ class OrderControllerTest {
         var uuid = order.getUuid();
         var expected = new AppResponse<>(orderDto);
 
-        Mockito.when(orderService.getOrderStatusByUuid(uuid)).thenReturn(orderDto);
+        Mockito.when(orderService.getOrderByUuid(uuid)).thenReturn(orderDto);
 
         mvc.perform(MockMvcRequestBuilders
                         .get(URL_TEMPLATE + "/status/uuid/" + uuid)
