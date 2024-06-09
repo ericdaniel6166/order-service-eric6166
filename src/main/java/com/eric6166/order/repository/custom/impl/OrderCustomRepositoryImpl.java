@@ -24,7 +24,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
     public Page<Order> findAllOrderByUsername(String username, Integer pageNumber, Integer pageSize) {
         var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
         String sql = """
-                WITH LATESTORDERSTATUS AS (
+                WITH LATEST_ORDER_STATUS AS (
                     SELECT O1.ORDER_DATE, MAX(O1.ORDER_STATUS_VALUE) AS MAX_STATUS
                     FROM T_ORDER O1
                     WHERE O1.USERNAME = :username
@@ -34,7 +34,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
                 )
                 SELECT O.*
                 FROM T_ORDER O
-                JOIN LATESTORDERSTATUS L
+                JOIN LATEST_ORDER_STATUS L
                     ON O.USERNAME = :username
                     AND O.ORDER_DATE = L.ORDER_DATE
                     AND O.ORDER_STATUS_VALUE = L.MAX_STATUS
