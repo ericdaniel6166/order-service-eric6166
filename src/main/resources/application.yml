@@ -20,7 +20,7 @@ app:
       port: 8181
       url: http://${app.swagger.server.hostname}:${app.swagger.server.port}/${app.context-path}
     info:
-      title: Inventory Service # change
+      title: Order Service # change
       version: v1.0 # change
   zipkin:
     hostname: localhost
