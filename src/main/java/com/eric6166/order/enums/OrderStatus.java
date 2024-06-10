@@ -23,6 +23,7 @@ public enum OrderStatus {
     private static final Map<Integer, OrderStatus> VALUE_MAP =
             Arrays.stream(OrderStatus.values())
                     .collect(Collectors.toMap(OrderStatus::getValue, Function.identity()));
+
     Integer value;
 
     public static OrderStatus fromValue(Integer value) {
