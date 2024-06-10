@@ -53,7 +53,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
                          FROM T_ORDER O1
                          WHERE O1.USERNAME = :username
                          GROUP BY O1.ORDER_DATE
-                     ) O2      
+                     ) O2
                 """;
         var mapSqlCount = new MapSqlParameterSource();
         mapSqlCount.addValue("username", username);
