@@ -70,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
         kafkaTemplate.send(kafkaProducerProps.getOrderCreatedTopicName(), orderCreatedEvent);
         return MessageResponse.builder()
                 .uuid(savedOrder.getUuid())
-                .message("Order Successfully Placed")
+                .message("Order Successfully Created")
                 .build();
     }
 
