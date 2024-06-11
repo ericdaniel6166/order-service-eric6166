@@ -6,12 +6,16 @@ import com.eric6166.order.repository.custom.OrderCustomRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -57,7 +61,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
                 """;
         var mapSqlCount = new MapSqlParameterSource();
         mapSqlCount.addValue("username", username);
-        var total = namedParameterJdbcTemplate.queryForObject(sqlCount, mapSqlCount, Long.class);
+        var total = ObjectUtils.defaultIfNull(namedParameterJdbcTemplate.queryForObject(sqlCount, mapSqlCount, Long.class), 0).longValue();
 
         return new PageImpl<>(orderList, pageable, total);
     }
