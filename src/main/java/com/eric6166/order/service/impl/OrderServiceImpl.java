@@ -76,7 +76,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public void handleOrderEvent(String uuid, String username, Object payload, String orderDate, OrderStatus orderStatus, BigDecimal totalAmount) throws JsonProcessingException {
+    public void handleOrderEvent(String uuid, String username, Object payload, String orderDate, OrderStatus orderStatus,
+                                 BigDecimal totalAmount) throws JsonProcessingException {
         var order = Order.builder()
                 .uuid(uuid)
                 .username(username)
@@ -121,7 +122,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException {
+    public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize)
+            throws JsonProcessingException {
         var page = orderRepository.findAllOrderByUsername(username, pageNumber, pageSize);
         var orderDtoList = buildOrderDtoList(page);
         return new PageResponse<>(orderDtoList, page);
