@@ -41,19 +41,22 @@ public class OrderController {
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/place-order-kafka")
-    public ResponseEntity<AppResponse<MessageResponse>> placeOrderKafka(@RequestBody OrderRequest request) throws JsonProcessingException {
+    public ResponseEntity<AppResponse<MessageResponse>> placeOrderKafka(@RequestBody OrderRequest request)
+            throws JsonProcessingException {
         return ResponseEntity.ok(new AppResponse<>(orderService.placeOrderKafka(request)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/uuid/{uuid}")
-    public ResponseEntity<AppResponse<OrderDto>> getOrderByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
+    public ResponseEntity<AppResponse<OrderDto>> getOrderByUuid(@PathVariable String uuid)
+            throws AppNotFoundException, JsonProcessingException {
         return ResponseEntity.ok(new AppResponse<>(orderService.getOrderByUuid(uuid)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/history/uuid/{uuid}")
-    public ResponseEntity<AppResponse<List<OrderDto>>> getOrderHistoryByUuid(@PathVariable String uuid) throws AppNotFoundException, JsonProcessingException {
+    public ResponseEntity<AppResponse<List<OrderDto>>> getOrderHistoryByUuid(@PathVariable String uuid)
+            throws AppNotFoundException, JsonProcessingException {
         return ResponseEntity.ok(new AppResponse<>(orderService.getOrderHistoryByUuid(uuid)));
     }
 
