@@ -34,7 +34,7 @@ public class KafkaConsumer {
         var span = tracer.nextSpan().name("handleInventoryReservedFailedEvent").start();
         try (var ws = tracer.withSpanInScope(span)) {
             span.tag("InventoryReservedFailedEvent uuid", appEvent.getUuid());
-            log.info("handleInventoryReservedFailed, appEvent: {}", appEvent);
+            log.info("handleInventoryReservedFailedEvent, appEvent: {}", appEvent);
             var payload = modelMapper.map(appEvent.getPayload(), InventoryReservedFailedEventPayload.class);
             orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_RESERVED_FAILED, null);
         } catch (RuntimeException e) {
