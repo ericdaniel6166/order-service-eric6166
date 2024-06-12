@@ -107,7 +107,7 @@ class OrderServiceImplTest {
         var orderCreatedItem1 = TestUtils.mockOrderCreatedItem(item1);
         var expected = MessageResponse.builder()
                 .uuid(savedOrder.getUuid())
-                .message("Order Successfully Placed")
+                .message("Order Successfully Created")
                 .build();
 
         Mockito.when(orderRepository.saveAndFlush(Mockito.any(Order.class))).thenReturn(savedOrder);

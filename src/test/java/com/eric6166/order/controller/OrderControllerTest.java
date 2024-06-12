@@ -118,7 +118,7 @@ class OrderControllerTest {
         Mockito.when(orderService.getOrderByUuid(uuid)).thenReturn(orderDto);
 
         mvc.perform(MockMvcRequestBuilders
-                        .get(URL_TEMPLATE + "/status/uuid/" + uuid)
+                        .get(URL_TEMPLATE + "/uuid/" + uuid)
                         .with(SecurityMockMvcRequestPostProcessors
                                 .jwt()
                                 .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
