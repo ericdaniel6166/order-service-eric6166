@@ -108,18 +108,33 @@ public class OrderServiceImpl implements OrderService {
         return buildOrderDtoList(orderList);
     }
 
+//    private List<OrderDto> buildOrderDtoList(Iterable<Order> orders) throws JsonProcessingException {
+//        List<OrderDto> orderDtoList = new ArrayList<>();
+//        for (var order : orders) {
+//            var orderDto = modelMapper.map(order, OrderDto.class);
+////            orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
+//            orderDto.setOrderDetail(null);
+//            orderDto.setOrderStatus(OrderStatus.fromValue(order.getOrderStatusValue()).name());
+////            orderDto.setOrderStatus(OrderStatus.fromValue(100).name());
+//            orderDtoList.add(orderDto);
+//        }
+//        return orderDtoList;
+//    }
+
     private List<OrderDto> buildOrderDtoList(Iterable<Order> orders) throws JsonProcessingException {
         List<OrderDto> orderDtoList = new ArrayList<>();
-        for (var order : orders) {
+        orders.forEach(order -> {
             var orderDto = modelMapper.map(order, OrderDto.class);
 //            orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
             orderDto.setOrderDetail(null);
             orderDto.setOrderStatus(OrderStatus.fromValue(order.getOrderStatusValue()).name());
 //            orderDto.setOrderStatus(OrderStatus.fromValue(100).name());
             orderDtoList.add(orderDto);
-        }
+        });
         return orderDtoList;
     }
+
+
 
     @Override
     public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize)
