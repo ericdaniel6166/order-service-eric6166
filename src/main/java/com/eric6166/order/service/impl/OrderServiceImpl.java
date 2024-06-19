@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
         var savedOrder = orderRepository.saveAndFlush(order);
         var orderCreatedEvent = AppEvent.builder()
                 .payload(OrderCreatedEventPayload.builder()
-                        .orderDate(DateTimeUtils.toString(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
+                        .orderDate(DateTimeUtils.toString(savedOrder.getOrderDate(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
                         .orderUuid(savedOrder.getUuid())
                         .username(savedOrder.getUsername())
                         .itemList(request.getItemList().stream()

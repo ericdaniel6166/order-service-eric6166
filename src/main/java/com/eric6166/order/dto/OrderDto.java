@@ -1,14 +1,12 @@
 package com.eric6166.order.dto;
 
-import com.eric6166.jpa.model.BaseEntity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,12 +15,11 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@ToString(callSuper = true)
-public class OrderDto extends BaseEntity<String> implements Serializable {
+public class OrderDto implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
