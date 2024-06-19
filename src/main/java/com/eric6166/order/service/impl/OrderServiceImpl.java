@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.util.Streamable;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -31,6 +33,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -105,27 +109,28 @@ public class OrderServiceImpl implements OrderService {
         if (orderList.isEmpty()) {
             throw new AppNotFoundException(String.format("order with uuid '%s'", uuid));
         }
-        return buildOrderDtoList(orderList);
+        return buildOrderDtoList(orderList.stream());
     }
 
-    private List<OrderDto> buildOrderDtoList(Iterable<Order> orders) throws JsonProcessingException {
-        List<OrderDto> orderDtoList = new ArrayList<>();
-        orders.forEach(order -> {
+    private List<OrderDto> buildOrderDtoList(Stream<Order> orders) throws JsonProcessingException {
+        return orders.map(order -> {
             var orderDto = modelMapper.map(order, OrderDto.class);
 //            orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
             orderDto.setOrderDetail(null);
             orderDto.setOrderStatus(OrderStatus.fromValue(order.getOrderStatusValue()).name());
 //            orderDto.setOrderStatus(OrderStatus.fromValue(100).name());
-            orderDtoList.add(orderDto);
-        });
-        return orderDtoList;
+            return orderDto;
+        }).toList();
     }
 
     @Override
     public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize)
             throws JsonProcessingException {
         var page = orderRepository.findAllOrderByUsername(username, pageNumber, pageSize);
-        var orderDtoList = buildOrderDtoList(page);
+        if (page.isEmpty()) {
+            return new PageResponse<>(new ArrayList<>(), page);
+        }
+        var orderDtoList = buildOrderDtoList(page.stream());
         return new PageResponse<>(orderDtoList, page);
     }
 
