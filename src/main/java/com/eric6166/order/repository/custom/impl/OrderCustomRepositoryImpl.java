@@ -41,11 +41,11 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
                     AND O.ORDER_STATUS_VALUE = L.MAX_STATUS
                 ORDER BY O.ORDER_DATE DESC
                 """;
-        var mapSql = new MapSqlParameterSource();
-        mapSql.addValue("username", username);
-        mapSql.addValue("offset", pageable.getOffset());
-        mapSql.addValue("pageSize", pageable.getPageSize());
-        var orderList = namedParameterJdbcTemplate.query(sql, mapSql, BeanPropertyRowMapper.newInstance(Order.class));
+        var paramSource = new MapSqlParameterSource();
+        paramSource.addValue("username", username);
+        paramSource.addValue("offset", pageable.getOffset());
+        paramSource.addValue("pageSize", pageable.getPageSize());
+        var orderList = namedParameterJdbcTemplate.query(sql, paramSource, BeanPropertyRowMapper.newInstance(Order.class));
 
         String sqlCount = """
                 SELECT COUNT(*)
@@ -56,9 +56,9 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
                          GROUP BY O1.ORDER_DATE
                      ) O2
                 """;
-        var mapSqlCount = new MapSqlParameterSource();
-        mapSqlCount.addValue("username", username);
-        var total = namedParameterJdbcTemplate.queryForObject(sqlCount, mapSqlCount, Long.class);
+        var paramSourceCount = new MapSqlParameterSource();
+        paramSourceCount.addValue("username", username);
+        var total = namedParameterJdbcTemplate.queryForObject(sqlCount, paramSourceCount, Long.class);
         Assert.notNull(total, "total must not be null");
         return new PageImpl<>(orderList, pageable, total);
     }
