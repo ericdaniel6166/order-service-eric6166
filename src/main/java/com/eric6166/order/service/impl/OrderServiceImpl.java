@@ -91,8 +91,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto getOrderByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
-        var order = orderRepository.findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, AppSecurityUtils.getUsername()).orElseThrow(()
+    public OrderDto getOrderByUuidAndUsername(String uuid, String username) throws AppNotFoundException, JsonProcessingException {
+        var order = orderRepository.findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username).orElseThrow(()
                 -> new AppNotFoundException(String.format("order with uuid '%s'", uuid)));
         var orderDto = modelMapper.map(order, OrderDto.class);
         orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
@@ -101,8 +101,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getOrderHistoryByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
-        var orderList = orderRepository.findByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, AppSecurityUtils.getUsername());
+    public List<OrderDto> getOrderHistoryByUuidAndUsername(String uuid, String username) throws AppNotFoundException, JsonProcessingException {
+        var orderList = orderRepository.findByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username);
         if (orderList.isEmpty()) {
             throw new AppNotFoundException(String.format("order with uuid '%s'", uuid));
         }

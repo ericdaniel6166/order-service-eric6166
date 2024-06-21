@@ -8,6 +8,7 @@ import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
 import com.eric6166.order.service.OrderService;
+import com.eric6166.security.utils.AppSecurityUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -50,25 +51,25 @@ public class OrderController {
     @GetMapping("/uuid/{uuid}")
     public ResponseEntity<AppResponse<OrderDto>> getOrderByUuid(@PathVariable String uuid)
             throws AppNotFoundException, JsonProcessingException {
-        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderByUuid(uuid)));
+        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderByUuidAndUsername(uuid, AppSecurityUtils.getUsername())));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/history/uuid/{uuid}")
     public ResponseEntity<AppResponse<List<OrderDto>>> getOrderHistoryByUuid(@PathVariable String uuid)
             throws AppNotFoundException, JsonProcessingException {
-        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderHistoryByUuid(uuid)));
+        return ResponseEntity.ok(new AppResponse<>(orderService.getOrderHistoryByUuidAndUsername(uuid, AppSecurityUtils.getUsername())));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
-    @GetMapping("/history/username/{username}")
+    @GetMapping("/history/{username}")
     public ResponseEntity<AppResponse<PageResponse<OrderDto>>> getOrderHistoryByUsername(@PathVariable String username,
-             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
-             @Min(value = BaseConst.DEFAULT_PAGE_NUMBER)
-             @Max(value = BaseConst.DEFAULT_MAX_INTEGER) Integer pageNumber,
-             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
-             @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
-             @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
+                                                                                         @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
+                                                                                         @Min(value = BaseConst.DEFAULT_PAGE_NUMBER)
+                                                                                         @Max(value = BaseConst.DEFAULT_MAX_INTEGER) Integer pageNumber,
+                                                                                         @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
+                                                                                         @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
+                                                                                         @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
     ) throws JsonProcessingException {
         var data = orderService.getOrderHistoryByUsername(username, pageNumber, pageSize);
         if (!data.getPageable().isHasContent()) {

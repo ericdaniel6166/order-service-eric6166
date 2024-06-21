@@ -13,6 +13,7 @@ import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.model.Order;
 import com.eric6166.order.service.OrderService;
 import com.eric6166.order.utils.TestUtils;
+import com.eric6166.security.utils.AppSecurityUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -20,10 +21,12 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.RandomUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -54,6 +57,8 @@ class OrderControllerTest {
     private static Order order1;
     private static OrderDto orderDto;
     private static OrderDto orderDto1;
+    private static String username;
+    private static MockedStatic<AppSecurityUtils> appSecurityUtilsMockedStatic;
 
     @Autowired
     MockMvc mvc;
@@ -64,11 +69,19 @@ class OrderControllerTest {
 
     @BeforeAll
     static void setUpAll() {
-        item = TestUtils.mockOrderRequestItem(1L, 100);
-        item1 = TestUtils.mockOrderRequestItem(2L, 200);
+        item = TestUtils.mockOrderRequestItem(RandomUtils.nextLong(1, 100), RandomUtils.nextInt(1, 10000));
+        item1 = TestUtils.mockOrderRequestItem(RandomUtils.nextLong(101, 200), RandomUtils.nextInt(1, 10000));
         orderRequest = TestUtils.mockOrderRequest(item, item1);
+        username = "customer";
+        appSecurityUtilsMockedStatic = Mockito.mockStatic(AppSecurityUtils.class);
+        appSecurityUtilsMockedStatic.when(AppSecurityUtils::getUsername).thenReturn(username);
     }
 
+    @AfterAll
+    static void tearDownAll() {
+        appSecurityUtilsMockedStatic.close();
+
+    }
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
@@ -87,7 +100,6 @@ class OrderControllerTest {
         order1.setOrderDetail(objectMapper.writeValueAsString(orderDetail1));
         orderDto1 = TestUtils.mockOrderDto(order1, orderDetail1);
     }
-
 
     @Test
     void placeOrderKafka_thenReturnOk() throws Exception {
@@ -115,7 +127,7 @@ class OrderControllerTest {
         var uuid = order.getUuid();
         var expected = new AppResponse<>(orderDto);
 
-        Mockito.when(orderService.getOrderByUuid(uuid)).thenReturn(orderDto);
+        Mockito.when(orderService.getOrderByUuidAndUsername(uuid, username)).thenReturn(orderDto);
 
         mvc.perform(MockMvcRequestBuilders
                         .get(URL_TEMPLATE + "/uuid/" + uuid)
@@ -136,7 +148,7 @@ class OrderControllerTest {
         var orderDtoList = List.of(orderDto1, orderDto);
         var expected = new AppResponse<>(orderDtoList);
 
-        Mockito.when(orderService.getOrderHistoryByUuid(uuid)).thenReturn(orderDtoList);
+        Mockito.when(orderService.getOrderHistoryByUuidAndUsername(uuid, username)).thenReturn(orderDtoList);
 
         mvc.perform(MockMvcRequestBuilders
                         .get(URL_TEMPLATE + "/history/uuid/" + uuid)
@@ -175,7 +187,7 @@ class OrderControllerTest {
         Mockito.when(orderService.getOrderHistoryByUsername(username, pageNumber, pageSize)).thenReturn(pageResponse);
 
         mvc.perform(MockMvcRequestBuilders
-                        .get(URL_TEMPLATE + "/history/username/" + username)
+                        .get(URL_TEMPLATE + "/history/" + username)
                         .with(SecurityMockMvcRequestPostProcessors
                                 .jwt()
                                 .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
@@ -201,7 +213,7 @@ class OrderControllerTest {
         Mockito.when(orderService.getOrderHistoryByUsername(username, pageNumber, pageSize)).thenReturn(pageResponse);
 
         mvc.perform(MockMvcRequestBuilders
-                        .get(URL_TEMPLATE + "/history/username/" + username)
+                        .get(URL_TEMPLATE + "/history/" + username)
                         .with(SecurityMockMvcRequestPostProcessors
                                 .jwt()
                                 .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
@@ -222,7 +234,7 @@ class OrderControllerTest {
                     var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
 
                     mvc.perform(MockMvcRequestBuilders
-                            .get(URL_TEMPLATE + "/history/username/" + username)
+                            .get(URL_TEMPLATE + "/history/" + username)
                             .with(SecurityMockMvcRequestPostProcessors
                                     .jwt()
                                     .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.RandomUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
@@ -53,6 +55,8 @@ class OrderServiceImplTest {
     private static OrderDto orderDto1;
     private static String username;
 
+    private static MockedStatic<AppSecurityUtils> appSecurityUtilsMockedStatic;
+
     @InjectMocks
     OrderServiceImpl orderService;
     @Mock
@@ -68,11 +72,18 @@ class OrderServiceImplTest {
 
     @BeforeAll
     static void setUpAll() {
-        item = TestUtils.mockOrderRequestItem(1L, 100);
-        item1 = TestUtils.mockOrderRequestItem(2L, 200);
+        item = TestUtils.mockOrderRequestItem(RandomUtils.nextLong(1, 100), RandomUtils.nextInt(1, 10000));
+        item1 = TestUtils.mockOrderRequestItem(RandomUtils.nextLong(101, 200), RandomUtils.nextInt(1, 10000));
         orderRequest = TestUtils.mockOrderRequest(item, item1);
         username = "customer";
-        Mockito.mockStatic(AppSecurityUtils.class).when(AppSecurityUtils::getUsername).thenReturn(username);
+        appSecurityUtilsMockedStatic = Mockito.mockStatic(AppSecurityUtils.class);
+        appSecurityUtilsMockedStatic.when(AppSecurityUtils::getUsername).thenReturn(username);
+
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        appSecurityUtilsMockedStatic.close();
 
     }
 
@@ -151,7 +162,7 @@ class OrderServiceImplTest {
         Mockito.when(orderRepository.findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username)).thenReturn(Optional.of(order1));
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         var expected = orderDto1;
-        var actual = orderService.getOrderByUuid(uuid);
+        var actual = orderService.getOrderByUuidAndUsername(uuid, username);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -161,7 +172,7 @@ class OrderServiceImplTest {
         var e = Assertions.assertThrows(AppNotFoundException.class,
                 () -> {
                     Mockito.when(orderRepository.findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username)).thenReturn(Optional.empty());
-                    orderService.getOrderByUuid(uuid);
+                    orderService.getOrderByUuidAndUsername(uuid, username);
                 });
 
         var expected = String.format("order with uuid '%s' not found", uuid);
@@ -176,7 +187,7 @@ class OrderServiceImplTest {
                 () -> {
 
                     Mockito.when(orderRepository.findByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username)).thenReturn(new ArrayList<>());
-                    orderService.getOrderHistoryByUuid(uuid);
+                    orderService.getOrderHistoryByUuidAndUsername(uuid, username);
                 });
 
         var expected = String.format("order with uuid '%s' not found", uuid);
@@ -192,7 +203,7 @@ class OrderServiceImplTest {
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         Mockito.when(modelMapper.map(order, OrderDto.class)).thenReturn(orderDto);
         var expected = List.of(orderDto1, orderDto);
-        var actual = orderService.getOrderHistoryByUuid(uuid);
+        var actual = orderService.getOrderHistoryByUuidAndUsername(uuid, username);
         Assertions.assertEquals(expected, actual);
     }
 
