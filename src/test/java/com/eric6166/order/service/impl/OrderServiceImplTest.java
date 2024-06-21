@@ -51,6 +51,7 @@ class OrderServiceImplTest {
     private static Order order1;
     private static OrderDto orderDto;
     private static OrderDto orderDto1;
+    private static String username;
 
     @InjectMocks
     OrderServiceImpl orderService;
@@ -70,13 +71,14 @@ class OrderServiceImplTest {
         item = TestUtils.mockOrderRequestItem(1L, 100);
         item1 = TestUtils.mockOrderRequestItem(2L, 200);
         orderRequest = TestUtils.mockOrderRequest(item, item1);
+        username = "customer";
+        Mockito.mockStatic(AppSecurityUtils.class).when(AppSecurityUtils::getUsername).thenReturn(username);
 
     }
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
         var uuid = UUID.randomUUID().toString();
-        var username = "customer";
 
         order = TestUtils.mockOrder(RandomUtils.nextLong(), uuid, username, OrderStatus.ORDER_CREATED, null, null);
         var orderDetail = TestUtils.mockOrderRequest(item, item1);
@@ -93,7 +95,6 @@ class OrderServiceImplTest {
 
     @Test
     void placeOrderKafka_thenReturnSuccess() throws JsonProcessingException {
-        var username = "customer";
         var orderDate = LocalDateTime.now();
         var savedOrder = Order.builder()
                 .id(RandomUtils.nextLong(1, 100))
@@ -113,7 +114,6 @@ class OrderServiceImplTest {
         Mockito.when(orderRepository.saveAndFlush(Mockito.any(Order.class))).thenReturn(savedOrder);
         Mockito.when(modelMapper.map(item, OrderCreatedEventPayload.Item.class)).thenReturn(orderCreatedItem);
         Mockito.when(modelMapper.map(item1, OrderCreatedEventPayload.Item.class)).thenReturn(orderCreatedItem1);
-        Mockito.mockStatic(AppSecurityUtils.class).when(AppSecurityUtils::getUsername).thenReturn(username);
 
         var actual = orderService.placeOrderKafka(orderRequest);
 
@@ -123,7 +123,6 @@ class OrderServiceImplTest {
 
     @Test
     void handleOrderEvent_thenReturnSuccess() throws JsonProcessingException {
-        var username = "customer";
         var uuid = UUID.randomUUID().toString();
         var inventoryReservedItem = TestUtils.mockInventoryReservedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var inventoryReservedItem1 = TestUtils.mockInventoryReservedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
@@ -149,7 +148,7 @@ class OrderServiceImplTest {
     @Test
     void getOrderStatusByUuid_thenReturnSuccess() throws AppNotFoundException, JsonProcessingException {
         var uuid = UUID.randomUUID().toString();
-        Mockito.when(orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(Optional.of(order1));
+        Mockito.when(orderRepository.findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username)).thenReturn(Optional.of(order1));
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         var expected = orderDto1;
         var actual = orderService.getOrderByUuid(uuid);
@@ -161,7 +160,7 @@ class OrderServiceImplTest {
         var uuid = UUID.randomUUID().toString();
         var e = Assertions.assertThrows(AppNotFoundException.class,
                 () -> {
-                    Mockito.when(orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(Optional.empty());
+                    Mockito.when(orderRepository.findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username)).thenReturn(Optional.empty());
                     orderService.getOrderByUuid(uuid);
                 });
 
@@ -175,7 +174,8 @@ class OrderServiceImplTest {
         var uuid = UUID.randomUUID().toString();
         var e = Assertions.assertThrows(AppNotFoundException.class,
                 () -> {
-                    Mockito.when(orderRepository.findByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(new ArrayList<>());
+
+                    Mockito.when(orderRepository.findByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username)).thenReturn(new ArrayList<>());
                     orderService.getOrderHistoryByUuid(uuid);
                 });
 
@@ -187,7 +187,8 @@ class OrderServiceImplTest {
     @Test
     void getOrderHistoryByUuid_thenReturnSuccess() throws AppNotFoundException, JsonProcessingException {
         var uuid = UUID.randomUUID().toString();
-        Mockito.when(orderRepository.findByUuidOrderByOrderStatusValueDesc(uuid)).thenReturn(List.of(order1, order));
+
+        Mockito.when(orderRepository.findByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, username)).thenReturn(List.of(order1, order));
         Mockito.when(modelMapper.map(order1, OrderDto.class)).thenReturn(orderDto1);
         Mockito.when(modelMapper.map(order, OrderDto.class)).thenReturn(orderDto);
         var expected = List.of(orderDto1, orderDto);

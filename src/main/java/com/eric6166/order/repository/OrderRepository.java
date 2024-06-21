@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderCustomRepository {
 
-    Optional<Order> findFirstByUuidOrderByOrderStatusValueDesc(String uuid);
+    Optional<Order> findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(String uuid, String username);
 
-    List<Order> findByUuidOrderByOrderStatusValueDesc(String uuid);
+    List<Order> findByUuidAndUsernameOrderByOrderStatusValueDesc(String uuid, String username);
 
 }

@@ -22,9 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.util.Streamable;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,7 +31,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 @Service
@@ -95,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
-        var order = orderRepository.findFirstByUuidOrderByOrderStatusValueDesc(uuid).orElseThrow(()
+        var order = orderRepository.findFirstByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, AppSecurityUtils.getUsername()).orElseThrow(()
                 -> new AppNotFoundException(String.format("order with uuid '%s'", uuid)));
         var orderDto = modelMapper.map(order, OrderDto.class);
         orderDto.setOrderDetail(objectMapper.readTree(order.getOrderDetail()));
@@ -105,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrderHistoryByUuid(String uuid) throws AppNotFoundException, JsonProcessingException {
-        var orderList = orderRepository.findByUuidOrderByOrderStatusValueDesc(uuid);
+        var orderList = orderRepository.findByUuidAndUsernameOrderByOrderStatusValueDesc(uuid, AppSecurityUtils.getUsername());
         if (orderList.isEmpty()) {
             throw new AppNotFoundException(String.format("order with uuid '%s'", uuid));
         }
