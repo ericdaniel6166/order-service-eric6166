@@ -209,7 +209,6 @@ class OrderServiceImplTest {
 
     @Test
     void getOrderHistoryByUsername_thenReturnSuccess() throws JsonProcessingException {
-        var username = "customer";
         var pageNumber = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_NUMBER, BaseConst.DEFAULT_MAX_INTEGER);
         var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
         var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);

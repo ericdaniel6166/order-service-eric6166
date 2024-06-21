@@ -86,7 +86,6 @@ class OrderControllerTest {
     @BeforeEach
     void setUp() throws JsonProcessingException {
         var uuid = UUID.randomUUID().toString();
-        var username = "customer";
 
         order = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.ORDER_CREATED, null, null);
         var orderDetail = TestUtils.mockOrderRequest(item, item1);
@@ -130,7 +129,7 @@ class OrderControllerTest {
         Mockito.when(orderService.getOrderByUuidAndUsername(uuid, username)).thenReturn(orderDto);
 
         mvc.perform(MockMvcRequestBuilders
-                        .get(URL_TEMPLATE + "/uuid/" + uuid)
+                        .get(URL_TEMPLATE + "/" + username + "/uuid/" + uuid)
                         .with(SecurityMockMvcRequestPostProcessors
                                 .jwt()
                                 .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
@@ -151,7 +150,7 @@ class OrderControllerTest {
         Mockito.when(orderService.getOrderHistoryByUuidAndUsername(uuid, username)).thenReturn(orderDtoList);
 
         mvc.perform(MockMvcRequestBuilders
-                        .get(URL_TEMPLATE + "/history/uuid/" + uuid)
+                        .get(URL_TEMPLATE + "/" + username + "/history/uuid/" + uuid)
                         .with(SecurityMockMvcRequestPostProcessors
                                 .jwt()
                                 .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
@@ -165,7 +164,6 @@ class OrderControllerTest {
 
     @Test
     void getOrderHistoryByUsername_thenReturnOk() throws Exception {
-        var username = order.getUsername();
         var uuid = UUID.randomUUID().toString();
         var order2 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.INVENTORY_RESERVED_FAILED, null, null);
         var inventoryReservedFailedItem = TestUtils.mockInventoryReservedFailedItem(item, RandomUtils.nextInt(0, item.getOrderQuantity() - 1));
@@ -187,7 +185,7 @@ class OrderControllerTest {
         Mockito.when(orderService.getOrderHistoryByUsername(username, pageNumber, pageSize)).thenReturn(pageResponse);
 
         mvc.perform(MockMvcRequestBuilders
-                        .get(URL_TEMPLATE + "/history/" + username)
+                        .get(URL_TEMPLATE + "/" + username + "/history")
                         .with(SecurityMockMvcRequestPostProcessors
                                 .jwt()
                                 .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
@@ -203,7 +201,6 @@ class OrderControllerTest {
 
     @Test
     void getOrderHistoryByUsername_givenDataHasNoContent_thenReturnNoContent() throws Exception {
-        var username = order.getUsername();
         var pageNumber = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_NUMBER, BaseConst.DEFAULT_MAX_INTEGER);
         var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
         var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
@@ -213,7 +210,7 @@ class OrderControllerTest {
         Mockito.when(orderService.getOrderHistoryByUsername(username, pageNumber, pageSize)).thenReturn(pageResponse);
 
         mvc.perform(MockMvcRequestBuilders
-                        .get(URL_TEMPLATE + "/history/" + username)
+                        .get(URL_TEMPLATE + "/" + username + "/history")
                         .with(SecurityMockMvcRequestPostProcessors
                                 .jwt()
                                 .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
@@ -229,12 +226,11 @@ class OrderControllerTest {
     void getOrderHistoryByUsername_givenPageNumberLessThan1_thenThrowConstraintViolationException() {
         var servletException = Assertions.assertThrows(ServletException.class,
                 () -> {
-                    var username = order.getUsername();
                     var pageNumber = -RandomUtils.nextInt(0, BaseConst.DEFAULT_MAX_INTEGER);
                     var pageSize = RandomUtils.nextInt(BaseConst.DEFAULT_PAGE_SIZE, BaseConst.MAXIMUM_PAGE_SIZE);
 
                     mvc.perform(MockMvcRequestBuilders
-                            .get(URL_TEMPLATE + "/history/" + username)
+                            .get(URL_TEMPLATE + "/" + username + "/history")
                             .with(SecurityMockMvcRequestPostProcessors
                                     .jwt()
                                     .authorities(new SimpleGrantedAuthority(TestConst.ROLE_CUSTOMER)))
