@@ -27,8 +27,8 @@ public enum OrderStatus {
     Integer value;
 
     public static OrderStatus fromValue(Integer value) {
-        return fromValueOptional(value)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("value '%s' is not a valid OrderStatus value", value)));
+        return fromValueOptional(value).orElseThrow(()
+                -> new IllegalArgumentException(String.format("value '%s' is not a valid OrderStatus value", value)));
     }
 
     public static Optional<OrderStatus> fromValueOptional(Integer value) {
