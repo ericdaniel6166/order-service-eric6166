@@ -93,7 +93,7 @@ class OrderControllerTest {
         order.setOrderDetail(objectMapper.writeValueAsString(orderDetail));
         orderDto = TestUtils.mockOrderDto(order, orderDetail);
 
-        order1 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.INVENTORY_RESERVED, null, null);
+        order1 = TestUtils.mockOrder(RandomUtils.nextLong(101, 200), uuid, username, OrderStatus.INVENTORY_RESERVED, null, null);
         var inventoryReservedItem = TestUtils.mockInventoryReservedItem(item, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var inventoryReservedItem1 = TestUtils.mockInventoryReservedItem(item1, BigDecimal.valueOf(RandomUtils.nextDouble(1, 10000)));
         var orderDetail1 = TestUtils.mockInventoryReservedEventPayload(uuid, username, inventoryReservedItem, inventoryReservedItem1);
@@ -166,7 +166,7 @@ class OrderControllerTest {
     @Test
     void getOrderHistoryByUsername_thenReturnOk() throws Exception {
         var uuid = UUID.randomUUID().toString();
-        var order2 = TestUtils.mockOrder(RandomUtils.nextLong(1, 100), uuid, username, OrderStatus.INVENTORY_RESERVED_FAILED, null, null);
+        var order2 = TestUtils.mockOrder(RandomUtils.nextLong(201, 300), uuid, username, OrderStatus.INVENTORY_RESERVED_FAILED, null, null);
         var inventoryReservedFailedItem = TestUtils.mockInventoryReservedFailedItem(item, RandomUtils.nextInt(0, item.getOrderQuantity() - 1));
         var inventoryReservedFailedItem1 = TestUtils.mockInventoryReservedFailedItem(item1, null);
         var orderDetail2 = InventoryReservedFailedEventPayload.builder()
