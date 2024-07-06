@@ -48,15 +48,13 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException {
-        var orderDate = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
-        var order = Order.builder()
+        var savedOrder = orderRepository.saveAndFlush(Order.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(AppSecurityUtils.getUsername())
                 .orderDetail(objectMapper.writeValueAsString(request))
                 .orderStatusValue(OrderStatus.ORDER_CREATED.getValue())
-                .orderDate(orderDate)
-                .build();
-        var savedOrder = orderRepository.saveAndFlush(order);
+                .orderDate(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+                .build());
         var orderCreatedEvent = AppEvent.builder()
                 .payload(OrderCreatedEventPayload.builder()
                         .orderDate(DateTimeUtils.toString(savedOrder.getOrderDate(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
@@ -79,15 +77,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void handleOrderEvent(String uuid, String username, Object payload, String orderDate, OrderStatus orderStatus,
                                  BigDecimal totalAmount) throws JsonProcessingException {
-        var order = Order.builder()
+        orderRepository.saveAndFlush(Order.builder()
                 .uuid(uuid)
                 .username(username)
                 .orderDetail(objectMapper.writeValueAsString(payload))
                 .orderDate(DateTimeUtils.toLocalDateTime(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
                 .orderStatusValue(orderStatus.getValue())
                 .totalAmount(totalAmount)
-                .build();
-        orderRepository.saveAndFlush(order);
+                .build());
     }
 
     @Override
