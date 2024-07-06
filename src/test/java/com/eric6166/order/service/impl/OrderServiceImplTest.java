@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -75,7 +76,7 @@ class OrderServiceImplTest {
         item = TestUtils.mockOrderRequestItem(RandomUtils.nextLong(1, 100), RandomUtils.nextInt(1, 10000));
         item1 = TestUtils.mockOrderRequestItem(RandomUtils.nextLong(101, 200), RandomUtils.nextInt(1, 10000));
         orderRequest = TestUtils.mockOrderRequest(item, item1);
-        username = "customer";
+        username = RandomStringUtils.random(30);
         appSecurityUtilsMockedStatic = Mockito.mockStatic(AppSecurityUtils.class);
         appSecurityUtilsMockedStatic.when(AppSecurityUtils::getUsername).thenReturn(username);
 
