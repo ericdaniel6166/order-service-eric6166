@@ -121,11 +121,7 @@ public class OrderServiceImpl implements OrderService {
     public PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize)
             throws JsonProcessingException {
         var page = orderRepository.findAllOrderByUsername(username, pageNumber, pageSize);
-        List<OrderDto> orderDtoList = new ArrayList<>();
-        if (page.hasContent()) {
-            orderDtoList = buildOrderDtoList(page.stream());
-        }
-        return new PageResponse<>(orderDtoList, page);
+        return new PageResponse<>(page.hasContent() ? buildOrderDtoList(page.stream()) : new ArrayList<>(), page);
     }
 
 }

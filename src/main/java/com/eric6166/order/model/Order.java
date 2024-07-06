@@ -43,7 +43,7 @@ public class Order extends BaseEntity<String> {
     LocalDateTime orderDate;
 
     @Column(name = "ORDER_STATUS_VALUE", nullable = false)
-    Integer orderStatusValue;
+    Float orderStatusValue;
 
     @Column(name = "ORDER_DETAIL", columnDefinition = "TEXT")
     String orderDetail;
