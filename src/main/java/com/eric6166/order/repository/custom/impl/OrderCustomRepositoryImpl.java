@@ -24,7 +24,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
     @Override
     public Page<Order> findAllOrderByUsername(String username, Integer pageNumber, Integer pageSize) {
         var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
-        String sql = """
+        var sql = """
                 WITH LATEST_ORDER_STATUS AS (
                     SELECT O1.ORDER_DATE, MAX(O1.ORDER_STATUS_VALUE) AS MAX_STATUS
                     FROM T_ORDER O1
@@ -47,7 +47,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
         paramSource.addValue("pageSize", pageable.getPageSize());
         var orderList = namedParameterJdbcTemplate.query(sql, paramSource, BeanPropertyRowMapper.newInstance(Order.class));
 
-        String sqlCount = """
+        var sqlCount = """
                 SELECT COUNT(*)
                 FROM (
                          SELECT 1
