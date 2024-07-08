@@ -18,8 +18,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.validation.ConstraintViolationException;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -47,7 +45,6 @@ import java.util.List;
 import java.util.UUID;
 
 @WebMvcTest(controllers = {OrderController.class})
-@FieldDefaults(level = AccessLevel.PRIVATE)
 class OrderControllerTest {
 
     private static final String URL_TEMPLATE = "/order";
@@ -62,11 +59,11 @@ class OrderControllerTest {
     private static MockedStatic<AppSecurityUtils> appSecurityUtilsMockedStatic;
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @MockBean
-    OrderService orderService;
+    private OrderService orderService;
 
     @BeforeAll
     static void setUpAll() {

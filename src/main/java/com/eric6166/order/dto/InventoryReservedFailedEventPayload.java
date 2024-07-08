@@ -1,11 +1,9 @@
 package com.eric6166.order.dto;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
@@ -13,21 +11,19 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class InventoryReservedFailedEventPayload {
-    String orderUuid;
-    String username;
-    List<Item> itemList;
-    String orderDate;
+    private String orderUuid;
+    private String username;
+    private List<Item> itemList;
+    private String orderDate;
 
     @Data
-    @FieldDefaults(level = AccessLevel.PRIVATE)
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Item {
-        Long productId;
-        Integer orderQuantity;
-        Integer inventoryQuantity;
+        private Long productId;
+        private Integer orderQuantity;
+        private Integer inventoryQuantity;
     }
 }

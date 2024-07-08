@@ -17,8 +17,6 @@ import com.eric6166.order.utils.TestUtils;
 import com.eric6166.security.utils.AppSecurityUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -44,7 +42,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-@FieldDefaults(level = AccessLevel.PRIVATE)
 class OrderServiceImplTest {
 
     private static OrderRequest.Item item;
@@ -59,17 +56,17 @@ class OrderServiceImplTest {
     private static MockedStatic<AppSecurityUtils> appSecurityUtilsMockedStatic;
 
     @InjectMocks
-    OrderServiceImpl orderService;
+    private OrderServiceImpl orderService;
     @Mock
-    KafkaTemplate<String, Object> kafkaTemplate;
+    private KafkaTemplate<String, Object> kafkaTemplate;
     @Mock
-    KafkaProducerProps kafkaProducerProps;
+    private KafkaProducerProps kafkaProducerProps;
     @Mock
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
     @Mock
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
     @Mock
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @BeforeAll
     static void setUpAll() {

@@ -17,9 +17,7 @@ import com.eric6166.security.utils.AppSecurityUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -36,14 +34,13 @@ import java.util.stream.Stream;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class OrderServiceImpl implements OrderService {
 
-    KafkaTemplate<String, Object> kafkaTemplate;
-    KafkaProducerProps kafkaProducerProps;
-    OrderRepository orderRepository;
-    ObjectMapper objectMapper;
-    ModelMapper modelMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaProducerProps kafkaProducerProps;
+    private final OrderRepository orderRepository;
+    private final ObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
 
     @Transactional
     @Override

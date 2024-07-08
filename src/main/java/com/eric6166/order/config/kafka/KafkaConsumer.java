@@ -7,9 +7,7 @@ import com.eric6166.order.dto.InventoryReservedFailedEventPayload;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -17,13 +15,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class KafkaConsumer {
 
-    Tracer tracer;
-    OrderService orderService;
-    ModelMapper modelMapper;
+    private final Tracer tracer;
+    private final OrderService orderService;
+    private final ModelMapper modelMapper;
 
     @KafkaListener(topics = "${spring.kafka.consumers.inventory-reserved-failed.topic-name}",
             groupId = "${spring.kafka.consumers.inventory-reserved-failed.group-id}",

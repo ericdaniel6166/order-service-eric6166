@@ -2,9 +2,7 @@ package com.eric6166.order.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RequestMapping("/test")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TestController {
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))

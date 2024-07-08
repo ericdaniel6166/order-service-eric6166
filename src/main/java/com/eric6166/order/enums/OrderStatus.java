@@ -1,9 +1,7 @@
 package com.eric6166.order.enums;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum OrderStatus {
     ORDER_CREATED(0f),
     INVENTORY_RESERVED(1f),
@@ -24,7 +21,7 @@ public enum OrderStatus {
             Arrays.stream(OrderStatus.values())
                     .collect(Collectors.toMap(OrderStatus::getValue, Function.identity()));
 
-    Float value;
+    private final Float value;
 
     public static OrderStatus fromValue(Float value) {
         return fromValueOptional(value).orElseThrow(()

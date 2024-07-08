@@ -3,9 +3,7 @@ package com.eric6166.order.repository.custom.impl;
 import com.eric6166.jpa.utils.PageUtils;
 import com.eric6166.order.model.Order;
 import com.eric6166.order.repository.custom.OrderCustomRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -16,10 +14,9 @@ import org.springframework.util.Assert;
 
 @Repository
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderCustomRepositoryImpl implements OrderCustomRepository {
 
-    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
     public Page<Order> findAllOrderByUsername(String username, Integer pageNumber, Integer pageSize) {
