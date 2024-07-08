@@ -64,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
                 .uuid(UUID.randomUUID().toString())
                 .build();
         kafkaTemplate.send(kafkaProducerProps.getOrderCreatedTopicName(), orderCreatedEvent);
+        log.info("orderCreatedEvent sent :{}", orderCreatedEvent.getUuid());
         return MessageResponse.builder()
                 .uuid(savedOrder.getUuid())
                 .message("Order Successfully Created")
