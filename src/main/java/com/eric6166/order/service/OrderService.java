@@ -22,4 +22,6 @@ public interface OrderService {
     List<OrderDto> getOrderHistoryByUuidAndUsername(String uuid, String username) throws AppNotFoundException, JsonProcessingException;
 
     PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException;
+
+    MessageResponse placeOrderMqtt(OrderRequest request);
 }

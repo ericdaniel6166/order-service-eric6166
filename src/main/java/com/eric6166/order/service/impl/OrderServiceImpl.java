@@ -42,6 +42,11 @@ public class OrderServiceImpl implements OrderService {
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper;
 
+    @Override
+    public MessageResponse placeOrderMqtt(OrderRequest request) {
+        return null;
+    }
+
     @Transactional
     @Override
     public MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException {

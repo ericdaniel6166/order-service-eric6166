@@ -45,6 +45,13 @@ public class OrderController {
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/place-order-mqtt")
+    public ResponseEntity<AppResponse<MessageResponse>> placeOrderMqtt(@RequestBody OrderRequest request)
+            throws JsonProcessingException {
+        return ResponseEntity.ok(new AppResponse<>(orderService.placeOrderMqtt(request)));
+    }
+
+    @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/{username}/uuid/{uuid}")
     @PreAuthorize("hasRole('ADMIN') or #username == authentication.name")
     public ResponseEntity<AppResponse<OrderDto>> getOrderByUuidAndUsername(@PathVariable String username, @PathVariable String uuid)
