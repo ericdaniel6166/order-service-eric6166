@@ -17,9 +17,8 @@ public enum OrderStatus {
     INVENTORY_RESERVED_FAILED(2f),
     ;
 
-    private static final Map<Float, OrderStatus> VALUE_MAP =
-            Arrays.stream(OrderStatus.values())
-                    .collect(Collectors.toMap(OrderStatus::getValue, Function.identity()));
+    private static final Map<Float, OrderStatus> VALUE_MAP = Arrays.stream(OrderStatus.values())
+            .collect(Collectors.toMap(OrderStatus::getValue, Function.identity()));
 
     private final Float value;
 
