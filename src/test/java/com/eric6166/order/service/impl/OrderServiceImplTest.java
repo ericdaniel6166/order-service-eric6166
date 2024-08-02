@@ -6,6 +6,7 @@ import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.utils.BaseConst;
 import com.eric6166.base.utils.BaseUtils;
 import com.eric6166.base.utils.DateTimeUtils;
+import com.eric6166.common.config.kafka.AppEvent;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.jpa.utils.PageUtils;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
@@ -41,6 +42,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
@@ -104,7 +106,7 @@ class OrderServiceImplTest {
     }
 
     @Test
-    void placeOrderKafka_thenReturnSuccess() throws JsonProcessingException {
+    void placeOrderKafka_thenReturnSuccess() throws JsonProcessingException, AppException {
         var orderDate = LocalDateTime.now();
         var savedOrder = Order.builder()
                 .orderId(Order.OrderId.builder()
@@ -124,6 +126,20 @@ class OrderServiceImplTest {
         Mockito.when(orderRepository.saveAndFlush(Mockito.any(Order.class))).thenReturn(savedOrder);
         Mockito.when(modelMapper.map(item, OrderCreatedEventPayload.Item.class)).thenReturn(orderCreatedItem);
         Mockito.when(modelMapper.map(item1, OrderCreatedEventPayload.Item.class)).thenReturn(orderCreatedItem1);
+        var orderCreatedTopicName = "order-created";
+        Mockito.when(kafkaProducerProps.getOrderCreatedTopicName()).thenReturn(orderCreatedTopicName);
+        var orderCreatedEvent = AppEvent.builder()
+                .payload(OrderCreatedEventPayload.builder()
+                        .orderDate(DateTimeUtils.toString(savedOrder.getOrderId().getOrderDate(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
+                        .username(savedOrder.getOrderId().getUsername())
+                        .itemList(orderRequest.getItemList().stream()
+                                .map(item -> modelMapper.map(item, OrderCreatedEventPayload.Item.class))
+                                .toList())
+                        .build())
+                .uuid(UUID.randomUUID().toString())
+                .build();
+        var sendResult = TestUtils.mockSendResultSuccess(orderCreatedTopicName, orderCreatedEvent);
+        Mockito.when(kafkaTemplate.send(Mockito.eq(orderCreatedTopicName), Mockito.any(AppEvent.class))).thenReturn(sendResult);
 
         var actual = orderService.placeOrderKafka(orderRequest);
 

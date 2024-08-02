@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException;
+    MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException, AppException;
 
     void handleOrderEvent(String username, Object payload, String orderDate, OrderStatus orderStatus, BigDecimal totalAmount) throws JsonProcessingException;
 

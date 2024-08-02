@@ -1,6 +1,7 @@
 package com.eric6166.order.utils;
 
 import com.eric6166.base.utils.DateTimeUtils;
+import com.eric6166.common.config.kafka.AppEvent;
 import com.eric6166.order.dto.InventoryReservedEventPayload;
 import com.eric6166.order.dto.InventoryReservedFailedEventPayload;
 import com.eric6166.order.dto.OrderCreatedEventPayload;
@@ -9,10 +10,16 @@ import com.eric6166.order.dto.OrderRequest;
 import com.eric6166.order.dto.OrderResponse;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.model.Order;
+import org.apache.commons.lang3.RandomUtils;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.TopicPartition;
+import org.springframework.kafka.support.SendResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public final class TestUtils {
 
@@ -94,5 +101,17 @@ public final class TestUtils {
                 .username(order.getOrderId().getUsername())
                 .orderStatusValue(order.getOrderId().getOrderStatusValue())
                 .build();
+    }
+
+    public static CompletableFuture<SendResult<String, Object>> mockSendResultSuccess(String topicName, AppEvent appEvent) {
+        return CompletableFuture.completedFuture(new SendResult<>(
+                new ProducerRecord<>(topicName, appEvent),
+                new RecordMetadata(
+                        new TopicPartition(topicName, RandomUtils.nextInt()),
+                        RandomUtils.nextLong(),
+                        RandomUtils.nextInt(),
+                        RandomUtils.nextLong(),
+                        RandomUtils.nextInt(),
+                        RandomUtils.nextInt())));
     }
 }

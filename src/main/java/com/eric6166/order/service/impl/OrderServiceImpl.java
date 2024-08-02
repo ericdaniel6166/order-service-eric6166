@@ -6,6 +6,7 @@ import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.exception.AppValidationException;
 import com.eric6166.base.utils.BaseUtils;
 import com.eric6166.base.utils.DateTimeUtils;
+import com.eric6166.common.Utils.CommonUtils;
 import com.eric6166.common.config.kafka.AppEvent;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
@@ -54,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException {
+    public MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException, AppException {
         var savedOrder = orderRepository.saveAndFlush(Order.builder()
                 .orderId(Order.OrderId.builder()
                         .orderDate(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
@@ -73,13 +74,14 @@ public class OrderServiceImpl implements OrderService {
                         .build())
                 .uuid(UUID.randomUUID().toString())
                 .build();
-        kafkaTemplate.send(kafkaProducerProps.getOrderCreatedTopicName(), orderCreatedEvent);
-        log.info("orderCreatedEvent sent :{}", orderCreatedEvent.getUuid());
+        var sendResult = kafkaTemplate.send(kafkaProducerProps.getOrderCreatedTopicName(), orderCreatedEvent);
+        CommonUtils.handleSendResult(orderCreatedEvent, sendResult);
         return MessageResponse.builder()
                 .uuid(BaseUtils.encode(DateTimeUtils.toString(savedOrder.getOrderId().getOrderDate(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER)))
                 .message("Order Successfully Created")
                 .build();
     }
+
 
     @Transactional
     @Override

@@ -41,7 +41,7 @@ public class OrderController {
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/place-order-kafka")
     public ResponseEntity<AppResponse<MessageResponse>> placeOrderKafka(@RequestBody OrderRequest request)
-            throws JsonProcessingException {
+            throws JsonProcessingException, AppException {
         return ResponseEntity.ok(new AppResponse<>(orderService.placeOrderKafka(request)));
     }
 
