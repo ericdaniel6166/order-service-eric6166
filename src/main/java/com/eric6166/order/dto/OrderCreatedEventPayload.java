@@ -12,7 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class OrderCreatedEventPayload {
-    private String orderUuid;
     private String username;
     private List<Item> itemList;
     private String orderDate;

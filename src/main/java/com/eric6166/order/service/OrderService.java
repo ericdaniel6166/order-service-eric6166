@@ -1,10 +1,10 @@
 package com.eric6166.order.service;
 
 import com.eric6166.base.dto.MessageResponse;
-import com.eric6166.base.exception.AppNotFoundException;
+import com.eric6166.base.exception.AppException;
 import com.eric6166.jpa.dto.PageResponse;
-import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
+import com.eric6166.order.dto.OrderResponse;
 import com.eric6166.order.enums.OrderStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -15,13 +15,13 @@ public interface OrderService {
 
     MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException;
 
-    void handleOrderEvent(String orderUuid, String username, Object payload, String orderDate, OrderStatus orderStatus, BigDecimal totalAmount) throws JsonProcessingException;
+    void handleOrderEvent(String username, Object payload, String orderDate, OrderStatus orderStatus, BigDecimal totalAmount) throws JsonProcessingException;
 
-    OrderDto getOrderByUuidAndUsername(String uuid, String username) throws AppNotFoundException, JsonProcessingException;
+    OrderResponse getOrderByUuidAndUsername(String uuid, String username) throws AppException, JsonProcessingException;
 
-    List<OrderDto> getOrderHistoryByUuidAndUsername(String uuid, String username) throws AppNotFoundException, JsonProcessingException;
+    List<OrderResponse> getOrderHistoryByUuidAndUsername(String uuid, String username) throws AppException;
 
-    PageResponse<OrderDto> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) throws JsonProcessingException;
+    PageResponse<OrderResponse> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize);
 
     MessageResponse placeOrderMqtt(OrderRequest request);
 }

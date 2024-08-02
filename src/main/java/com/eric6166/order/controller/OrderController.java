@@ -2,11 +2,11 @@ package com.eric6166.order.controller;
 
 import com.eric6166.base.dto.AppResponse;
 import com.eric6166.base.dto.MessageResponse;
-import com.eric6166.base.exception.AppNotFoundException;
+import com.eric6166.base.exception.AppException;
 import com.eric6166.base.utils.BaseConst;
 import com.eric6166.jpa.dto.PageResponse;
-import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
+import com.eric6166.order.dto.OrderResponse;
 import com.eric6166.order.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,23 +54,23 @@ public class OrderController {
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/{username}/uuid/{uuid}")
     @PreAuthorize("hasRole('ADMIN') or #username == authentication.name")
-    public ResponseEntity<AppResponse<OrderDto>> getOrderByUuidAndUsername(@PathVariable String username, @PathVariable String uuid)
-            throws AppNotFoundException, JsonProcessingException {
+    public ResponseEntity<AppResponse<OrderResponse>> getOrderByUuidAndUsername(@PathVariable String username, @PathVariable String uuid)
+            throws AppException, JsonProcessingException {
         return ResponseEntity.ok(new AppResponse<>(orderService.getOrderByUuidAndUsername(uuid, username)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/{username}/history/uuid/{uuid}")
     @PreAuthorize("hasRole('ADMIN') or #username == authentication.name")
-    public ResponseEntity<AppResponse<List<OrderDto>>> getOrderHistoryByUuidAndUsername(@PathVariable String username, @PathVariable String uuid)
-            throws AppNotFoundException, JsonProcessingException {
+    public ResponseEntity<AppResponse<List<OrderResponse>>> getOrderHistoryByUuidAndUsername(@PathVariable String username, @PathVariable String uuid)
+            throws AppException {
         return ResponseEntity.ok(new AppResponse<>(orderService.getOrderHistoryByUuidAndUsername(uuid, username)));
     }
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/{username}/history")
     @PreAuthorize("hasRole('ADMIN') or #username == authentication.name")
-    public ResponseEntity<AppResponse<PageResponse<OrderDto>>> getOrderHistoryByUsername(
+    public ResponseEntity<AppResponse<PageResponse<OrderResponse>>> getOrderHistoryByUsername(
             @PathVariable String username,
             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
             @Min(value = BaseConst.DEFAULT_PAGE_NUMBER)
@@ -78,7 +78,7 @@ public class OrderController {
             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_SIZE_STRING)
             @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
             @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
-    ) throws JsonProcessingException {
+    ) {
         var data = orderService.getOrderHistoryByUsername(username, pageNumber, pageSize);
         if (!data.getPageable().isHasContent()) {
             return ResponseEntity.noContent().build();

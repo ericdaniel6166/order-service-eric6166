@@ -1,12 +1,13 @@
 package com.eric6166.order.dto;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -15,15 +16,14 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDto {
-    @Column(name = "ORDER_DATE")
+public class OrderResponse implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private LocalDateTime orderDate;
-    @Column(name = "USERNAME")
     private String username;
-    @Column(name = "ORDER_STATUS_VALUE")
-    private Float orderStatusValue;
-    @Column(name = "TOTAL_AMOUNT")
+    private String uuid;
+    private String orderStatus;
     private BigDecimal totalAmount;
-    @Column(name = "ORDER_DETAIL")
-    private String orderDetail;
+    private Object orderDetail;
 }

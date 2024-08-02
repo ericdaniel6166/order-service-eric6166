@@ -33,7 +33,7 @@ public class KafkaConsumer {
             span.tag("InventoryReservedFailedEvent uuid", appEvent.getUuid());
             log.info("handleInventoryReservedFailedEvent, appEvent: {}", appEvent);
             var payload = modelMapper.map(appEvent.getPayload(), InventoryReservedFailedEventPayload.class);
-            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_RESERVED_FAILED, null);
+            orderService.handleOrderEvent(payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_RESERVED_FAILED, null);
         } catch (RuntimeException e) {
             log.info("e: {} , errorMessage: {}", e.getClass().getName(), e.getMessage()); // comment // for local testing
             span.error(e);
@@ -55,7 +55,7 @@ public class KafkaConsumer {
             span.tag("InventoryReservedEvent uuid", appEvent.getUuid());
             log.info("handleInventoryReservedEvent, appEvent: {}", appEvent);
             var payload = modelMapper.map(appEvent.getPayload(), InventoryReservedEventPayload.class);
-            orderService.handleOrderEvent(payload.getOrderUuid(), payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_RESERVED, null);
+            orderService.handleOrderEvent(payload.getUsername(), payload, payload.getOrderDate(), OrderStatus.INVENTORY_RESERVED, null);
         } catch (RuntimeException e) {
             log.info("e: {} , errorMessage: {}", e.getClass().getName(), e.getMessage()); // comment // for local testing
             span.error(e);
