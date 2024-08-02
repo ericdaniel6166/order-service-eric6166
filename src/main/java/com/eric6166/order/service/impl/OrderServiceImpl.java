@@ -6,7 +6,7 @@ import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.exception.AppValidationException;
 import com.eric6166.base.utils.BaseUtils;
 import com.eric6166.base.utils.DateTimeUtils;
-import com.eric6166.common.Utils.CommonUtils;
+import com.eric6166.common.utils.CommonUtils;
 import com.eric6166.common.config.kafka.AppEvent;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
