@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InventoryReservedEventPayload {
-    private String orderUuid;
     private String username;
     private List<Item> itemList;
     private String orderDate;

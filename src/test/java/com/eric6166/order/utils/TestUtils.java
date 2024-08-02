@@ -6,6 +6,7 @@ import com.eric6166.order.dto.InventoryReservedFailedEventPayload;
 import com.eric6166.order.dto.OrderCreatedEventPayload;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.dto.OrderRequest;
+import com.eric6166.order.dto.OrderResponse;
 import com.eric6166.order.enums.OrderStatus;
 import com.eric6166.order.model.Order;
 
@@ -19,9 +20,8 @@ public final class TestUtils {
         throw new IllegalStateException("Utility class");
     }
 
-    public static InventoryReservedEventPayload mockInventoryReservedEventPayload(String uuid, String username, InventoryReservedEventPayload.Item... inventoryReservedItems) {
+    public static InventoryReservedEventPayload mockInventoryReservedEventPayload(String username, InventoryReservedEventPayload.Item... inventoryReservedItems) {
         return InventoryReservedEventPayload.builder()
-                .orderUuid(uuid)
                 .orderDate(DateTimeUtils.toString(LocalDateTime.now(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER))
                 .username(username)
                 .itemList(List.of(inventoryReservedItems))
@@ -49,26 +49,23 @@ public final class TestUtils {
 
     }
 
-    public static Order mockOrder(Long id, String uuid, String username, OrderStatus orderStatus, String orderDetail, BigDecimal totalAmount) {
+    public static Order mockOrder(String username, OrderStatus orderStatus, String orderDetail, BigDecimal totalAmount) {
         return Order.builder()
-                .id(id)
-                .uuid(uuid)
-                .username(username)
-                .orderStatusValue(orderStatus.getValue())
-                .orderDate(LocalDateTime.now())
+                .orderId(Order.OrderId.builder()
+                        .username(username)
+                        .orderDate(LocalDateTime.now())
+                        .orderStatusValue(orderStatus.getValue())
+                        .build())
                 .orderDetail(orderDetail)
                 .totalAmount(totalAmount)
                 .build();
     }
 
-    public static OrderDto mockOrderDto(Order order, Object orderDetail) {
-        return OrderDto.builder()
-                .id(order.getId())
-                .uuid(order.getUuid())
-                .username(order.getUsername())
-                .orderStatus(OrderStatus.fromValue(order.getOrderStatusValue()).name())
+    public static OrderResponse mockOrderResponse(Order order) {
+        return OrderResponse.builder()
+                .orderDate(order.getOrderId().getOrderDate())
+                .orderStatus(OrderStatus.fromValue(order.getOrderId().getOrderStatusValue()).name())
                 .totalAmount(order.getTotalAmount())
-                .orderDetail(orderDetail)
                 .build();
 
     }
@@ -86,6 +83,16 @@ public final class TestUtils {
                 .productId(item.getProductId())
                 .orderQuantity(item.getOrderQuantity())
                 .inventoryQuantity(inventoryQuantity)
+                .build();
+    }
+
+    public static OrderDto mockOrderDto(Order order) {
+        return OrderDto.builder()
+                .totalAmount(order.getTotalAmount())
+                .orderDate(order.getOrderId().getOrderDate())
+                .orderDetail(order.getOrderDetail())
+                .username(order.getOrderId().getUsername())
+                .orderStatusValue(order.getOrderId().getOrderStatusValue())
                 .build();
     }
 }
