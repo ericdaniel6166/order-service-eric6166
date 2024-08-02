@@ -189,7 +189,8 @@ class OrderControllerTest {
         var pageResponse = new PageResponse<>(orderResponseList, new PageImpl<>(orderResponseList, pageable, orderResponseList.size()));
         var expected = new AppResponse<>(pageResponse);
 
-        Mockito.when(orderService.getOrderHistoryByUsername(username, pageNumber, pageSize)).thenReturn(pageResponse);
+        int days = 30;
+        Mockito.when(orderService.getOrderHistoryByUsername(username, days, pageNumber, pageSize)).thenReturn(pageResponse);
 
         mvc.perform(MockMvcRequestBuilders
                         .get(URL_TEMPLATE + "/" + username + "/history")
@@ -200,6 +201,7 @@ class OrderControllerTest {
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .param("pageNumber", String.valueOf(pageNumber))
+                        .param("days", String.valueOf(days))
                         .param("pageSize", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(expected)));
@@ -214,7 +216,8 @@ class OrderControllerTest {
         List<OrderResponse> orderResponseList = new ArrayList<>();
         var pageResponse = new PageResponse<>(orderResponseList, new PageImpl<>(orderResponseList, pageable, orderResponseList.size()));
 
-        Mockito.when(orderService.getOrderHistoryByUsername(username, pageNumber, pageSize)).thenReturn(pageResponse);
+        int days = 30;
+        Mockito.when(orderService.getOrderHistoryByUsername(username, days, pageNumber, pageSize)).thenReturn(pageResponse);
 
         mvc.perform(MockMvcRequestBuilders
                         .get(URL_TEMPLATE + "/" + username + "/history")
@@ -225,6 +228,7 @@ class OrderControllerTest {
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .characterEncoding(StandardCharsets.UTF_8)
                         .param("pageNumber", String.valueOf(pageNumber))
+                        .param("days", String.valueOf(days))
                         .param("pageSize", String.valueOf(pageSize)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }

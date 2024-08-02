@@ -146,8 +146,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public PageResponse<OrderResponse> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize) {
-        var page = orderRepository.findAllOrderByUsername(username, pageNumber, pageSize);
+    public PageResponse<OrderResponse> getOrderHistoryByUsername(String username, int days, Integer pageNumber, Integer pageSize) {
+        var page = orderRepository.findAllOrderByUsername(username, days, pageNumber, pageSize);
         return new PageResponse<>(page.hasContent() ? buildOrderDtoList(page.stream()) : new ArrayList<>(), page);
     }
 

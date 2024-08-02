@@ -5,6 +5,6 @@ import org.springframework.data.domain.Page;
 
 public interface OrderCustomRepository {
 
-    Page<OrderDto> findAllOrderByUsername(String username, Integer pageNumber, Integer pageSize);
+    Page<OrderDto> findAllOrderByUsername(String username, int days, Integer pageNumber, Integer pageSize);
 
 }

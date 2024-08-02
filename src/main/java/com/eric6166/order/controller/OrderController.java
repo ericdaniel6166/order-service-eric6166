@@ -4,6 +4,7 @@ import com.eric6166.base.dto.AppResponse;
 import com.eric6166.base.dto.MessageResponse;
 import com.eric6166.base.exception.AppException;
 import com.eric6166.base.utils.BaseConst;
+import com.eric6166.base.validation.ValidString;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.order.dto.OrderRequest;
 import com.eric6166.order.dto.OrderResponse;
@@ -46,8 +47,7 @@ public class OrderController {
 
     @Operation(security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/place-order-mqtt")
-    public ResponseEntity<AppResponse<MessageResponse>> placeOrderMqtt(@RequestBody OrderRequest request)
-            throws JsonProcessingException {
+    public ResponseEntity<AppResponse<MessageResponse>> placeOrderMqtt(@RequestBody OrderRequest request) {
         return ResponseEntity.ok(new AppResponse<>(orderService.placeOrderMqtt(request)));
     }
 
@@ -72,6 +72,11 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN') or #username == authentication.name")
     public ResponseEntity<AppResponse<PageResponse<OrderResponse>>> getOrderHistoryByUsername(
             @PathVariable String username,
+            @RequestParam(required = false, defaultValue = BaseConst.PREVIOUS_30_DAYS)
+            @ValidString(values = {
+                    BaseConst.PREVIOUS_30_DAYS,
+                    BaseConst.PREVIOUS_60_DAYS,
+                    BaseConst.PREVIOUS_90_DAYS}) String days,
             @RequestParam(required = false, defaultValue = BaseConst.DEFAULT_PAGE_NUMBER_STRING)
             @Min(value = BaseConst.DEFAULT_PAGE_NUMBER)
             @Max(value = BaseConst.DEFAULT_MAX_INTEGER) Integer pageNumber,
@@ -79,7 +84,7 @@ public class OrderController {
             @Min(value = BaseConst.DEFAULT_PAGE_SIZE)
             @Max(value = BaseConst.MAXIMUM_PAGE_SIZE) Integer pageSize
     ) {
-        var data = orderService.getOrderHistoryByUsername(username, pageNumber, pageSize);
+        var data = orderService.getOrderHistoryByUsername(username, Integer.parseInt(days), pageNumber, pageSize);
         if (!data.getPageable().isHasContent()) {
             return ResponseEntity.noContent().build();
         }

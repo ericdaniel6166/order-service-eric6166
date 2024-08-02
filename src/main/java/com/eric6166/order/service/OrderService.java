@@ -21,7 +21,7 @@ public interface OrderService {
 
     List<OrderResponse> getOrderHistoryByUuidAndUsername(String uuid, String username) throws AppException;
 
-    PageResponse<OrderResponse> getOrderHistoryByUsername(String username, Integer pageNumber, Integer pageSize);
+    PageResponse<OrderResponse> getOrderHistoryByUsername(String username, int days, Integer pageNumber, Integer pageSize);
 
     MessageResponse placeOrderMqtt(OrderRequest request);
 }

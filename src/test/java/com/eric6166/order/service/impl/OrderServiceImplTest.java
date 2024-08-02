@@ -53,6 +53,7 @@ class OrderServiceImplTest {
     private static OrderResponse orderResponse;
     private static OrderResponse orderResponse1;
     private static String username;
+    private static ObjectMapper mapper;
 
     private static MockedStatic<AppSecurityUtils> appSecurityUtilsMockedStatic;
 
@@ -77,6 +78,7 @@ class OrderServiceImplTest {
         username = RandomStringUtils.random(30);
         appSecurityUtilsMockedStatic = Mockito.mockStatic(AppSecurityUtils.class);
         appSecurityUtilsMockedStatic.when(AppSecurityUtils::getUsername).thenReturn(username);
+        mapper = new ObjectMapper();
 
     }
 
@@ -90,7 +92,6 @@ class OrderServiceImplTest {
     void setUp() throws JsonProcessingException {
         order = TestUtils.mockOrder(username, OrderStatus.ORDER_CREATED, null, null);
         var orderDetail = TestUtils.mockOrderRequest(item, item1);
-        ObjectMapper mapper = new ObjectMapper();
         order.setOrderDetail(mapper.writeValueAsString(orderDetail));
         orderResponse = TestUtils.mockOrderResponse(order);
 
@@ -105,7 +106,6 @@ class OrderServiceImplTest {
     @Test
     void placeOrderKafka_thenReturnSuccess() throws JsonProcessingException {
         var orderDate = LocalDateTime.now();
-        var mapper = new ObjectMapper();
         var savedOrder = Order.builder()
                 .orderId(Order.OrderId.builder()
                         .username(username)
@@ -140,7 +140,6 @@ class OrderServiceImplTest {
         var orderDateStr = DateTimeUtils.toString(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER);
         var orderStatus = OrderStatus.INVENTORY_RESERVED;
         BigDecimal totalAmount = null;
-        var mapper = new ObjectMapper();
         var orderDetail = mapper.writeValueAsString(payload);
         var order = Order.builder()
                 .orderId(Order.OrderId.builder()
@@ -159,7 +158,6 @@ class OrderServiceImplTest {
 
     @Test
     void getOrderByUuidAndUsername_thenReturnSuccess() throws AppException, JsonProcessingException {
-        var mapper = new ObjectMapper();
         var order2 = TestUtils.mockOrder(username, OrderStatus.ORDER_CREATED, mapper.writeValueAsString(orderRequest), null);
         var orderDate = order2.getOrderId().getOrderDate();
         var uuid = BaseUtils.encode(DateTimeUtils.toString(orderDate, DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER));
@@ -230,9 +228,10 @@ class OrderServiceImplTest {
         var orderDtoList = List.of(orderResponse4, orderResponse3);
         var expected = new PageResponse<>(orderDtoList, new PageImpl<>(orderList, pageable, orderDtoList.size()));
 
-        Mockito.when(orderRepository.findAllOrderByUsername(username, pageNumber, pageSize)).thenReturn(page);
+        int days = 30;
+        Mockito.when(orderRepository.findAllOrderByUsername(username, days, pageNumber, pageSize)).thenReturn(page);
 
-        var actual = orderService.getOrderHistoryByUsername(username, pageNumber, pageSize);
+        var actual = orderService.getOrderHistoryByUsername(username, days, pageNumber, pageSize);
 
         Assertions.assertEquals(expected.getContent(), actual.getContent());
 

@@ -22,9 +22,9 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Override
-    public Page<OrderDto> findAllOrderByUsername(String username, Integer pageNumber, Integer pageSize) {
+    public Page<OrderDto> findAllOrderByUsername(String username, int days, Integer pageNumber, Integer pageSize) {
         var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
-        var orderDate = LocalDateTime.now().minusDays(90);
+        var orderDate = LocalDateTime.now().minusDays(days);
         var sqlCount = """
                 SELECT COUNT(*)
                 FROM (
@@ -59,7 +59,6 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
                 ORDER BY O.ORDER_DATE DESC;
                 """;
         var paramSource = new MapSqlParameterSource();
-
         paramSource.addValue("username", username);
         paramSource.addValue("offset", pageable.getOffset());
         paramSource.addValue("pageSize", pageable.getPageSize());
