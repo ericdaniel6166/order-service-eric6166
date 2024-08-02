@@ -6,7 +6,7 @@ import com.eric6166.base.exception.AppNotFoundException;
 import com.eric6166.base.exception.AppValidationException;
 import com.eric6166.base.utils.BaseUtils;
 import com.eric6166.base.utils.DateTimeUtils;
-import com.eric6166.common.utils.CommonUtils;
+import com.eric6166.common.config.kafka.KafkaUtils;
 import com.eric6166.common.config.kafka.AppEvent;
 import com.eric6166.jpa.dto.PageResponse;
 import com.eric6166.order.config.kafka.KafkaProducerProps;
@@ -75,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
                 .uuid(UUID.randomUUID().toString())
                 .build();
         var sendResult = kafkaTemplate.send(kafkaProducerProps.getOrderCreatedTopicName(), orderCreatedEvent);
-        CommonUtils.handleSendResult(orderCreatedEvent, sendResult);
+        KafkaUtils.handleSendResult(orderCreatedEvent, sendResult);
         return MessageResponse.builder()
                 .uuid(BaseUtils.encode(DateTimeUtils.toString(savedOrder.getOrderId().getOrderDate(), DateTimeUtils.DEFAULT_LOCAL_DATE_TIME_FORMATTER)))
                 .message("Order Successfully Created")
