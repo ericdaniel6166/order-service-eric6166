@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         var orderDate = getOrderDate(uuid);
         var order = orderRepository.getOrderByOrderDateAndUsername(orderDate, username).orElseThrow(()
                 -> new AppNotFoundException(String.format("order with uuid '%s'", uuid),
-                String.format("order with uuid '%s', orderDate '%s', username '%s'", uuid, orderDate, username)));
+                String.format("order with uuid '%s', orderDate '%s', username '%s' not found", uuid, orderDate, username)));
         var orderResponse = new OrderResponse();
         orderResponse.setOrderDate(order.getOrderId().getOrderDate());
         orderResponse.setOrderStatus(OrderStatus.fromValue(order.getOrderId().getOrderStatusValue()).name());
