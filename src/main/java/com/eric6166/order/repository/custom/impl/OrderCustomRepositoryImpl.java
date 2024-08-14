@@ -1,5 +1,6 @@
 package com.eric6166.order.repository.custom.impl;
 
+import com.eric6166.base.utils.DateTimeUtils;
 import com.eric6166.jpa.utils.PageUtils;
 import com.eric6166.order.dto.OrderDto;
 import com.eric6166.order.repository.custom.OrderCustomRepository;
@@ -24,7 +25,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
     @Override
     public Page<OrderDto> findAllOrderByUsername(String username, int days, Integer pageNumber, Integer pageSize) {
         var pageable = PageUtils.buildSimplePageable(pageNumber, pageSize);
-        var orderDate = LocalDateTime.now().minusDays(days);
+        var orderDate = LocalDateTime.now(DateTimeUtils.DEFAULT_ZONE_ID).minusDays(days);
         var sqlCount = """
                 SELECT COUNT(*)
                 FROM (
