@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
     public MessageResponse placeOrderKafka(OrderRequest request) throws JsonProcessingException, AppException {
         var savedOrder = orderRepository.saveAndFlush(Order.builder()
                 .orderId(Order.OrderId.builder()
-                        .orderDate(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+                        .orderDate(LocalDateTime.now(DateTimeUtils.DEFAULT_ZONE_ID).truncatedTo(ChronoUnit.MICROS))
                         .username(AppSecurityUtils.getUsername())
                         .orderStatusValue(OrderStatus.ORDER_CREATED.getValue())
                         .build())
